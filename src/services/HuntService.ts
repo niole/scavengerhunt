@@ -1,6 +1,8 @@
 import { Hunt } from '../domain/Hunt';
 
 type HuntService = {
+  getAllHunts: (creatorId: string) => Hunt[];
+
   createHunt: (name: string, creatorId: string) => Hunt;
 
   deleteHunt: (huntId: string) => void;
@@ -14,6 +16,10 @@ type HuntService = {
 let hunts: Hunt[] = [];
 
 const DefaultHuntService: HuntService = {
+  getAllHunts: (creatorId: string) => {
+    return hunts.filter((hunt: Hunt) => hunt.creatorId === creatorId);
+  },
+
   createHunt: (name: string, creatorId: string) => {
     const newHunt = {
       name,

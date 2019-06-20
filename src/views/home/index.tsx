@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { Hunt } from '../../domain/Hunt';
 import HuntService from '../../services/HuntService';
 
 import Dialog from '@material-ui/core/Dialog';
@@ -37,6 +38,7 @@ const Modal = withToggle<{ onConfirm: (name: string) => void}>(props => (
                         throw new Error('Must provide name for hunt');
                     } else {
                         props.onConfirm(name);
+                        props.onClose();
                     }
                     return;
                 }}
@@ -45,12 +47,42 @@ const Modal = withToggle<{ onConfirm: (name: string) => void}>(props => (
             />
         </DialogContent>
     </Dialog>
-))();
+))(undefined, { children: 'Create New Hunt' });
 
-const Home = () => (
-    <div>
-        <Modal onConfirm={(name: string) => HuntService.createHunt(name, 'x')}/>
-    </div>
-);
+type State = {
+    hunts: Hunt[];
+};
+
+class Home extends React.PureComponent<{}, State> {
+    state = {
+        hunts: [],
+    };
+
+    componentDidMount() {
+        this.setState({ hunts: HuntService.getAllHunts('x') });
+    }
+
+    handleHuntCreate = (name: string) => {
+        HuntService.createHunt(name, 'x');
+        this.setState({ hunts: HuntService.getAllHunts('x') });
+    }
+
+    render() {
+        const { hunts } = this.state;
+        return (
+            <div>
+                <Modal onConfirm={this.handleHuntCreate}/>
+                <div>
+                    {hunts.map((hunt: Hunt) => (
+                        <div>
+                            hunt
+                            {hunt.name}
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
+    }
+}
 
 export default Home;

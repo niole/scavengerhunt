@@ -20,7 +20,7 @@ export type InnerProps = {
     onClose: () => void;
 };
 
-export default function withToggle<OuterProps>(Component: ChildComponent<InnerProps & OuterProps>): (ButtonComponent?: Button) => ChildComponent<OuterProps> {
+export default function withToggle<OuterProps>(Component: ChildComponent<InnerProps & OuterProps>): (ButtonComponent?: Button, defaultState?: ButtonState) => ChildComponent<OuterProps> {
     return (ButtonComponent?: Button, defaultState?: ButtonState) => (props: OuterProps) => {
         const state = defaultState || {};
         const defaultButtonState = { visible: state.visible || false, children: state.children || 'Open' };

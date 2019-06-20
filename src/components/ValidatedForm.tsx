@@ -75,6 +75,10 @@ class ValidatedForm<V extends { [key: string]: any }> extends React.PureComponen
         const disableSubmit = !!Object.values(newErrors).find((error: any) => !!error);
 
         this.setState({ errors: newErrors, disableSubmit, submitError: undefined});
+
+        if (!disableSubmit) {
+            onSuccess();
+        }
     }
 
     handleInputChange = (key: string, validator: Validator<any>) => (event: any) => {
@@ -125,7 +129,7 @@ class ValidatedForm<V extends { [key: string]: any }> extends React.PureComponen
                         <Button onClick={onCancel}>
                             Cancel
                         </Button>
-                        <Button disabled={disableSubmit} onClick={this.onSubmit} type="submit">
+                        <Button disabled={disableSubmit} onClick={this.onSubmit}>
                             Submit
                         </Button>
                     </>
