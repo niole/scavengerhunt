@@ -10,10 +10,7 @@ export type PluggableProps<C, V> = {
     value: V;
 };
 
-export type Validator<V> = {
-    validator: (value: V) => boolean;
-    error: (value: V) => string;
-} | undefined;
+export type Validator<V> = ((value: V) => string | undefined) | undefined;
 
 export type PluggableInput<C, V> = (props: PluggableProps<C, V>) => JSX.Element;
 
@@ -32,9 +29,11 @@ type Props<V> = {
     defaultValues: V;
 };
 
+type Errors =  { [key: string]: string | undefined };
+
 type State<V> = {
     values: V
-    errors: { [key: string]: string | undefined };
+    errors: Errors;
     disableSubmit: boolean;
     submitError?: string;
 };
@@ -52,23 +51,48 @@ class ValidatedForm<V extends { [key: string]: any }> extends React.PureComponen
     onSubmit = () => {
         const { onSubmit } = this.props;
         const { values } = this.state;
-        onSubmit(values).catch((error: any) => {
-            this.setState({ disableSubmit: true, submitError: `there was an error: ${error}` });
+        this.handlePresubmitValidation(() => {
+            onSubmit(values).catch((error: any) => {
+                this.setState({ disableSubmit: true, submitError: `there was an error: ${error}` });
+            });
         });
     }
 
-    handleInputChange = (key: string, validation: Validator<any>) => (event: any) => {
+    handlePresubmitValidation = (onSuccess: () => void): void => {
+        const { values } = this.state;
+        const { inputs } = this.props;
+        const flattenedInputs = inputs.reduce(
+            (acc: ValidatedInput<any, any, any>[], row: ValidatedInput<any, any, any>[]) => [...acc, ...row]
+        , []);
+        const newErrors = flattenedInputs.reduce((errors: Errors, { key, validator }: ValidatedInput<any, any, any>) => ({
+            ...errors,
+            [key]: validator ? validator(values[key]) : undefined,
+        }), {});
+
+        const disableSubmit = !!Object.values(newErrors).find((error: any) => !!error);
+
+        this.setState({ errors: newErrors, disableSubmit, submitError: undefined});
+    }
+
+    handleInputChange = (key: string, validator: Validator<any>) => (event: any) => {
         this.setState({ submitError: undefined });
-        if (validation) {
-            const { errors, values } = this.state;
-            const { validator, error } = validation;
-            const invalid = !validator(event);
-            if (invalid) {
-                this.setState({ disableSubmit: true, errors: { ...errors, [key]: error(values[key]) } });
+        if (validator) {
+            const { values, errors } = this.state;
+            const errorMessage = validator(event);
+            if (!!errorMessage) {
+                this.setState({
+                    disableSubmit: true,
+                    errors: { ...errors, [key]: errorMessage },
+                    values: { ...values, [key]: event },
+                });
             } else {
                 const newErrors = { ...errors, [key]: undefined };
-                const shouldEnableSubmit = !!Object.values(newErrors).find((error: any) => !!error);
-                this.setState({ errors: newErrors, disableSubmit: !shouldEnableSubmit });
+                const disableSubmit = !!Object.values(newErrors).find((error: any) => !!error);
+                this.setState({
+                    errors: newErrors,
+                    disableSubmit,
+                    values: { ...values, [key]: event },
+                });
             }
         }
     }
@@ -79,9 +103,9 @@ class ValidatedForm<V extends { [key: string]: any }> extends React.PureComponen
         return (
             <form>
                 {inputs.map((inputRow: ValidatedInput<any, any, any>[]) => (
-                    <div>
+                    <div key={inputRow[0].key}>
                         {inputRow.map(({ key, Input, validator }: ValidatedInput<any, any, any>) => (
-                            <span>
+                            <span key={key}>
                                 <Input
                                     onChange={this.handleInputChange(key, validator)}
                                     value={values[key]}

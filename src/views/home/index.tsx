@@ -1,26 +1,48 @@
 import React from 'react';
-import Button from '@material-ui/core/Button';
 import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
-import withToggle, { InnerProps as ModalBaseProps } from '../../containers/withToggle';
+import TextField from '@material-ui/core/TextField';
+import ValidatedForm from '../../components/ValidatedForm';
+import withToggle from '../../containers/withToggle';
 
-const Modal = withToggle<{}>((props: ModalBaseProps) => (
+const Modal = withToggle<{ onConfirm: (name: string) => void}>(props => (
     <Dialog open={props.visible} onClose={props.onClose}>
         <DialogTitle>
             Create A Hunt
         </DialogTitle>
         <div>
-            name: <input />
+            <ValidatedForm
+                inputs={[[
+                    {
+                        key: 'name',
+                        validator: (value: string) => !value ? 'must have name' : undefined,
+                        Input: ({ value, onChange }: { value: string | undefined, onChange: (event: any) => void}) => (
+                            <TextField
+                                label="Name"
+                                value={value}
+                                onChange={(event: any) => onChange(event.target.value)}
+                            />
+                        )
+                    }
+                ]]}
+                onSubmit={async ({ name }: { name: string | undefined }) => {
+                    if (!name) {
+                        throw new Error('Must provide name for hunt');
+                    } else {
+                        props.onConfirm(name);
+                    }
+                    return;
+                }}
+                onCancel={props.onClose}
+                defaultValues={{ name: undefined }}
+            />
         </div>
-        <Button onClick={props.onClose}>
-            submit
-        </Button>
     </Dialog>
 ))();
 
 const Home = () => (
     <div>
-        <Modal />
+        <Modal onConfirm={(name: string) => console.log(name)}/>
     </div>
 );
 
