@@ -1,13 +1,15 @@
 import React from 'react';
+import FormHelperText from '@material-ui/core/FormHelperText';
 import Button from '@material-ui/core/Button';
 
 const Error = ({ message }: { message?: string }) => (
-    message ? <span>{message}</span> : null
+    message ? <FormHelperText>{message}</FormHelperText> : null
 );
 
 export type PluggableProps<C, V> = {
     onChange: (event: C) => void;
     value: V;
+    error?: string;
 };
 
 export type Validator<V> = ((value: V) => string | undefined) | undefined;
@@ -21,6 +23,7 @@ export type ValidatedInput<A, C, V> = {
 };
 
 type Props<V> = {
+    ActionsContainer?: any;
     inputs: ValidatedInput<any, any, any>[][];
     onSubmit: (values: V) => Promise<void>;
     onCancel: () => void;
@@ -98,7 +101,7 @@ class ValidatedForm<V extends { [key: string]: any }> extends React.PureComponen
     }
 
     render() {
-        const { inputs, onCancel } = this.props;
+        const { ActionsContainer = 'div', inputs, onCancel } = this.props;
         const { submitError, disableSubmit, errors, values } = this.state;
         return (
             <form>
@@ -109,21 +112,24 @@ class ValidatedForm<V extends { [key: string]: any }> extends React.PureComponen
                                 <Input
                                     onChange={this.handleInputChange(key, validator)}
                                     value={values[key]}
+                                    error={errors[key]}
                                 />
                                 <Error message={errors[key]} />
                             </span>
                         ))}
                     </div>
                 ))}
-                <div>
-                    <Error message={submitError} />
-                    <Button onClick={onCancel}>
-                        Cancel
-                    </Button>
-                    <Button disabled={disableSubmit} onClick={this.onSubmit} type="submit">
-                        Submit
-                    </Button>
-                </div>
+                <ActionsContainer>
+                    <>
+                        <Error message={submitError} />
+                        <Button onClick={onCancel}>
+                            Cancel
+                        </Button>
+                        <Button disabled={disableSubmit} onClick={this.onSubmit} type="submit">
+                            Submit
+                        </Button>
+                    </>
+                </ActionsContainer>
             </form>
         );
     }

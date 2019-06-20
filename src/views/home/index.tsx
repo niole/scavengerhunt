@@ -1,8 +1,13 @@
 import React from 'react';
+
+import HuntService from '../../services/HuntService';
+
 import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
+import DialogContent from '@material-ui/core/DialogContent';
+import DialogActions from '@material-ui/core/DialogActions';
 import TextField from '@material-ui/core/TextField';
-import ValidatedForm from '../../components/ValidatedForm';
+import ValidatedForm, { PluggableProps } from '../../components/ValidatedForm';
 import withToggle from '../../containers/withToggle';
 
 const Modal = withToggle<{ onConfirm: (name: string) => void}>(props => (
@@ -10,14 +15,16 @@ const Modal = withToggle<{ onConfirm: (name: string) => void}>(props => (
         <DialogTitle>
             Create A Hunt
         </DialogTitle>
-        <div>
+        <DialogContent>
             <ValidatedForm
+                ActionsContainer={DialogActions}
                 inputs={[[
                     {
                         key: 'name',
                         validator: (value: string) => !value ? 'must have name' : undefined,
-                        Input: ({ value, onChange }: { value: string | undefined, onChange: (event: any) => void}) => (
+                            Input: ({ value, onChange, error }: PluggableProps<any, string>) => (
                             <TextField
+                                error={error ? true : undefined}
                                 label="Name"
                                 value={value}
                                 onChange={(event: any) => onChange(event.target.value)}
@@ -36,13 +43,13 @@ const Modal = withToggle<{ onConfirm: (name: string) => void}>(props => (
                 onCancel={props.onClose}
                 defaultValues={{ name: undefined }}
             />
-        </div>
+        </DialogContent>
     </Dialog>
 ))();
 
 const Home = () => (
     <div>
-        <Modal onConfirm={(name: string) => console.log(name)}/>
+        <Modal onConfirm={(name: string) => HuntService.createHunt(name, 'x')}/>
     </div>
 );
 
