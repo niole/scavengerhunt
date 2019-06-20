@@ -8,6 +8,7 @@ import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions';
 import TextField from '@material-ui/core/TextField';
+import HuntSummary from './HuntSummary';
 import ValidatedForm, { PluggableProps } from '../../components/ValidatedForm';
 import withToggle from '../../containers/withToggle';
 
@@ -74,10 +75,9 @@ class Home extends React.PureComponent<{}, State> {
                 <Modal onConfirm={this.handleHuntCreate}/>
                 <div>
                     {hunts.map((hunt: Hunt) => (
-                        <div>
-                            hunt
-                            {hunt.name}
-                        </div>
+                        <HuntSummary
+                            name={hunt.name}
+                        />
                     ))}
                 </div>
             </div>
