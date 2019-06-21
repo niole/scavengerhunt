@@ -1,5 +1,7 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { RouteComponentProps } from 'react-router';
+import Button from '@material-ui/core/Button';
 import { LatLng, Clue, ClueUpdate } from '../../domain/Clue';
 import { Hunt } from '../../domain/Hunt';
 import HuntService from '../../services/HuntService';
@@ -55,11 +57,29 @@ const handleUpdateClue = (getData: () => void) => (clueUpdate: ClueUpdate) => {
     getData();
 };
 
+const handleStartHunt = (huntId: string) => () => {
+    console.log('start hun', huntId);
+};
+
 const HuntView = ({ hunt = {} as Hunt, clues, creatorId, getData }: Props) => (
     <div>
-        Hunt {hunt.name || ''}
+        <h1>Hunt</h1> <h2>{hunt.name || ''}</h2>
         <div>
-            <CreateClueModal onConfirm={handleCreateClue(hunt.id || '', creatorId || '', getData)} />
+            <div>
+                <CreateClueModal
+                    onConfirm={handleCreateClue(hunt.id || '', creatorId || '', getData)}
+                />
+                <Button>
+                    <Link to={`/invite/${hunt.id}/${creatorId}`}>
+                        Invite Teams
+                    </Link>
+                </Button>
+                <Button
+                    onClick={handleStartHunt(hunt.id || '')}
+                >
+                    Start Hunt
+                </Button>
+            </div>
             {!clues.length && 'Add some clues'}
             {clues.map((clue: Clue, index: number) => (
                 <ClueSummary
