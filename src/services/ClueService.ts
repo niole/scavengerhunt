@@ -1,4 +1,4 @@
-import { ClueUpdate, Clue } from '../domain/Clue';
+import { ClueUpdate, Clue, LatLng } from '../domain/Clue';
 import { InProgressClue } from '../domain/InProgressClue';
 
 // TODO delete
@@ -8,12 +8,13 @@ let clues: Clue[] = [{
     creatorId: 'x',
     huntId: 'huntidy',
     assetUri: undefined,
+    location: [0, 0],
 }];
 // TODO delete
 let inProgressClues: InProgressClue[] = [];
 
 type ClueService = {
-  createClue: (text: string, huntId: string, creatorId: string) => Clue;
+  createClue: (location: LatLng, text: string, huntId: string, creatorId: string) => Clue;
 
   deleteClue: (clueId: string) => void;
 
@@ -31,13 +32,14 @@ type ClueService = {
 };
 
 const DefaultClueService: ClueService = {
-  createClue: (text: string, huntId: string, creatorId: string, assetUri?: string) => {
+  createClue: (location: LatLng, text: string, huntId: string, creatorId: string, assetUri?: string) => {
     const newClue = {
       text,
       huntId,
       creatorId,
       assetUri,
       id: `${Math.random()}`,
+      location,
     };
 
     clues.push(newClue);

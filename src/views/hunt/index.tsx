@@ -1,6 +1,6 @@
 import React from 'react';
 import { RouteComponentProps } from 'react-router';
-import { Clue, ClueUpdate } from '../../domain/Clue';
+import { LatLng, Clue, ClueUpdate } from '../../domain/Clue';
 import { Hunt } from '../../domain/Hunt';
 import HuntService from '../../services/HuntService';
 import ClueService from '../../services/ClueService';
@@ -9,7 +9,7 @@ import withToggle from '../../containers/withToggle';
 import ClueSummary from './ClueSummary';
 import CreateEditClueModal from './CreateEditClueModal';
 
-const CreateClueModal = withToggle<{ onConfirm: (text: string) => void}>(props =>
+const CreateClueModal = withToggle<{ onConfirm: (text: string, location: LatLng) => void}>(props =>
     <CreateEditClueModal
         {...props}
         editing={false}
@@ -41,8 +41,12 @@ const dataFetcher = withDataGetter<OuterProps, FetchResult>(
     (props: OuterProps) => `${props.match.params.huntId}${props.match.params.creatorId}`
 );
 
-const handleCreateClue = (huntId: string, creatorId: string, getData: () => void) => (clueText: string) => {
-    ClueService.createClue(clueText, huntId, creatorId);
+const handleCreateClue = (
+        huntId: string,
+        creatorId: string,
+        getData: () => void
+    ) => (clueText: string, location: LatLng) => {
+    ClueService.createClue(location, clueText, huntId, creatorId);
     getData();
 };
 
@@ -59,6 +63,7 @@ const HuntView = ({ hunt = {} as Hunt, clues, creatorId, getData }: Props) => (
             {!clues.length && 'Add some clues'}
             {clues.map((clue: Clue, index: number) => (
                 <ClueSummary
+                    location={clue.location}
                     key={clue.id}
                     name={`#${index + 1}`}
                     text={clue.text}

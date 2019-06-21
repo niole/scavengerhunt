@@ -1,5 +1,5 @@
 import React from 'react';
-import { ClueUpdate } from '../../domain/Clue';
+import { LatLng, ClueUpdate } from '../../domain/Clue';
 import withToggle from '../../containers/withToggle';
 import CreateEditClueModal from './CreateEditClueModal';
 
@@ -22,9 +22,11 @@ type Props = {
     text: string;
     clueId: string;
     handleClueUpdate: (update: ClueUpdate) => void;
+    location: LatLng;
 };
 
 const ClueSummary = ({
+        location,
         name,
         text,
         clueId,
@@ -34,6 +36,9 @@ const ClueSummary = ({
         <div>
             <div>
                 {name} <EditClueModal onConfirm={handleUpdateClue(handleClueUpdate, clueId)} defaultText={text} />
+            </div>
+            <div>
+                location {JSON.stringify(location)}
             </div>
             <div>
                 {text}
