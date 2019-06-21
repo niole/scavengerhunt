@@ -11,6 +11,8 @@ type HuntService = {
 
   startHunt: (huntId: string) => void;
 
+  stopHunt: (huntId: string) => void;
+
   endHunt: (huntId: string) => void;
 };
 
@@ -54,6 +56,15 @@ const DefaultHuntService: HuntService = {
     hunts = hunts.map((hunt: Hunt) => {
       if (hunt.id === huntId) {
         return { ...hunt, inProgress: true };
+      }
+      return hunt;
+    });
+  },
+
+  stopHunt: (huntId: string) => {
+    hunts = hunts.map((hunt: Hunt) => {
+      if (hunt.id === huntId) {
+        return { ...hunt, inProgress: false };
       }
       return hunt;
     });

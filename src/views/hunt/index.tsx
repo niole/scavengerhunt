@@ -57,8 +57,40 @@ const handleUpdateClue = (getData: () => void) => (clueUpdate: ClueUpdate) => {
     getData();
 };
 
-const handleStartHunt = (huntId: string) => () => {
-    console.log('start hun', huntId);
+const handleStartHunt = (huntId: string, dataGetter: () => void) => () => {
+    HuntService.startHunt(huntId);
+    dataGetter();
+};
+
+const handleEndHunt = (huntId: string, dataGetter: () => void) => () => {
+    HuntService.endHunt(huntId);
+    dataGetter();
+};
+
+const handleStopHunt = (huntId: string, dataGetter: () => void) => () => {
+    HuntService.stopHunt(huntId);
+    dataGetter();
+};
+
+const getHuntLifeCycleButtonProps = (dataGetter: () => void, hunt?: Hunt) => {
+    if (!!hunt) {
+        if (hunt.inProgress && !hunt.ended) {
+            return {
+                onClick: handleStopHunt(hunt.id, dataGetter),
+                children: 'Stop Hunt',
+            };
+        }
+        if (!hunt.inProgress && !hunt.ended) {
+            return {
+                onClick: handleStartHunt(hunt.id, dataGetter),
+                children: 'Start Hunt',
+            };
+        }
+    }
+    return {
+        children: 'Start Hunt',
+        disabled: true,
+    };
 };
 
 const HuntView = ({ hunt = {} as Hunt, clues, creatorId, getData }: Props) => (
@@ -74,10 +106,9 @@ const HuntView = ({ hunt = {} as Hunt, clues, creatorId, getData }: Props) => (
                         Invite Teams
                     </Link>
                 </Button>
-                <Button
-                    onClick={handleStartHunt(hunt.id || '')}
-                >
-                    Start Hunt
+                <Button {...getHuntLifeCycleButtonProps(getData, hunt)} />
+                <Button disabled={!hunt.inProgress} onClick={handleEndHunt(hunt.id || '', getData)}>
+                    End Hunt
                 </Button>
             </div>
             {!clues.length && 'Add some clues'}
