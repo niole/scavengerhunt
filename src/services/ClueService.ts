@@ -20,6 +20,8 @@ type ClueService = {
   getInProgressClue: (teamId: string) => undefined | InProgressClue;
 
   updateClue: (update: ClueUpdate) => undefined | Clue;
+
+  getClues: (huntId: string) => Clue[];
 };
 
 const DefaultClueService: ClueService = {
@@ -83,5 +85,10 @@ const DefaultClueService: ClueService = {
       }
       return;
   },
+
+  getClues: (huntId: string) => {
+    return clues.filter((clue: Clue) => clue.huntId === huntId);
+  },
 };
 
+export default DefaultClueService;
