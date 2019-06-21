@@ -53,14 +53,18 @@ const Modal = withToggle<{ onConfirm: (name: string) => void}>(props => (
 
 type Props = {
     hunts: Hunt[];
-    creatorId: string;
+    creatorId: string | undefined;
     getData: () => void;
 };
 
-const dataFetcher = withDataGetter<{ creatorId: string }, { hunts: Hunt[]; creatorId: string }>(
-    async ({ creatorId }) => ({ hunts: HuntService.getAllHunts(creatorId), creatorId }),
-    { creatorId: '', hunts: [] },
-    props => props.creatorId,
+type OuterProps = {
+    creatorId: string | undefined;
+};
+
+const dataFetcher = withDataGetter<OuterProps, { hunts: Hunt[]; creatorId: string | undefined }>(
+    async ({ creatorId }) => creatorId ? { hunts: HuntService.getAllHunts(creatorId), creatorId } : { hunts: [], creatorId: undefined },
+    { hunts: [], creatorId: undefined },
+    (props: OuterProps) => props.creatorId,
 );
 
 const handleHuntCreate = (creatorId: string, setHunts: () => void) => (name: string) => {
@@ -68,7 +72,7 @@ const handleHuntCreate = (creatorId: string, setHunts: () => void) => (name: str
     setHunts();
 };
 
-const Home = ({ hunts, creatorId, getData }: Props) => (
+const Home = ({ hunts, creatorId = '', getData }: Props) => (
     <div>
         <Modal onConfirm={handleHuntCreate(creatorId, getData)}/>
         <div>
@@ -84,4 +88,8 @@ const Home = ({ hunts, creatorId, getData }: Props) => (
     </div>
 );
 
-export default dataFetcher(Home);
+const BaseHome = dataFetcher(Home);
+
+const WithIdMocked = () => <BaseHome creatorId="x" />;
+
+export default WithIdMocked;

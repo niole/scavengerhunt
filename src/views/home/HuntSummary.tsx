@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 type Props = {
     name: string;
@@ -8,9 +9,9 @@ type Props = {
 
 const HuntSummary = ({ name, huntId, creatorId }: Props) => (
     <div>
-        <a href={`/hunt/${huntId}/${creatorId}`}>
+        <Link to={`/hunt/${huntId}/${creatorId}`}>
             hunt: {name}
-        </a>
+        </Link>
     </div>
 );
 

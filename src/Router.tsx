@@ -1,14 +1,15 @@
 import React from 'react';
-import { BrowserRouter as Router, Route } from 'react-router-dom';
+import { Route, Switch } from 'react-router';
+import { BrowserRouter as Router } from 'react-router-dom';
 import Home from './views/home';
 import Hunt from './views/hunt';
 
 const routes = () => (
   <Router>
-    <div>
-      <Route exact path="/" component={Home} />
+    <Switch>
+      <Route exact path="/home" component={Home} />
       <Route exact path="/hunt/:huntId/:creatorId" component={Hunt} />
-    </div>
+    </Switch>
   </Router>
 );
 
