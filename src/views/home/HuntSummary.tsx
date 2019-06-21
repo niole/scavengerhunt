@@ -2,11 +2,15 @@ import React from 'react';
 
 type Props = {
     name: string;
+    creatorId: string;
+    huntId: string;
 };
 
-const HuntSummary = ({ name }: Props) => (
+const HuntSummary = ({ name, huntId, creatorId }: Props) => (
     <div>
-        hunt: {name}
+        <a href={`/hunt/${huntId}/${creatorId}`}>
+            hunt: {name}
+        </a>
     </div>
 );
 

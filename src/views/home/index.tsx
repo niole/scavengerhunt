@@ -3,6 +3,7 @@ import React from 'react';
 import { Hunt } from '../../domain/Hunt';
 import HuntService from '../../services/HuntService';
 
+import withDataGetter from '../../containers/withDataGetter';
 import Dialog from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
@@ -50,39 +51,37 @@ const Modal = withToggle<{ onConfirm: (name: string) => void}>(props => (
     </Dialog>
 ))(undefined, { children: 'Create New Hunt' });
 
-type State = {
+type Props = {
     hunts: Hunt[];
+    creatorId: string;
+    getData: () => void;
 };
 
-class Home extends React.PureComponent<{}, State> {
-    state = {
-        hunts: [],
-    };
+const dataFetcher = withDataGetter<{ creatorId: string }, { hunts: Hunt[]; creatorId: string }>(
+    async ({ creatorId }) => ({ hunts: HuntService.getAllHunts(creatorId), creatorId }),
+    { creatorId: '', hunts: [] },
+    props => props.creatorId,
+);
 
-    componentDidMount() {
-        this.setState({ hunts: HuntService.getAllHunts('x') });
-    }
+const handleHuntCreate = (creatorId: string, setHunts: () => void) => (name: string) => {
+    HuntService.createHunt(name, creatorId);
+    setHunts();
+};
 
-    handleHuntCreate = (name: string) => {
-        HuntService.createHunt(name, 'x');
-        this.setState({ hunts: HuntService.getAllHunts('x') });
-    }
+const Home = ({ hunts, creatorId, getData }: Props) => (
+    <div>
+        <Modal onConfirm={handleHuntCreate(creatorId, getData)}/>
+        <div>
+            {hunts.map((hunt: Hunt) => (
+                <HuntSummary
+                    key={hunt.id}
+                    creatorId={creatorId}
+                    huntId={hunt.id}
+                    name={hunt.name}
+                />
+            ))}
+        </div>
+    </div>
+);
 
-    render() {
-        const { hunts } = this.state;
-        return (
-            <div>
-                <Modal onConfirm={this.handleHuntCreate}/>
-                <div>
-                    {hunts.map((hunt: Hunt) => (
-                        <HuntSummary
-                            name={hunt.name}
-                        />
-                    ))}
-                </div>
-            </div>
-        );
-    }
-}
-
-export default Home;
+export default dataFetcher(Home);
