@@ -2,7 +2,13 @@ import { ClueUpdate, Clue } from '../domain/Clue';
 import { InProgressClue } from '../domain/InProgressClue';
 
 // TODO delete
-let clues: Clue[] = [];
+let clues: Clue[] = [{
+    text: 'This is a clue.',
+    id: 'cluid',
+    creatorId: 'x',
+    huntId: 'huntidy',
+    assetUri: undefined,
+}];
 // TODO delete
 let inProgressClues: InProgressClue[] = [];
 

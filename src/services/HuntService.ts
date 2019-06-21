@@ -15,7 +15,14 @@ type HuntService = {
 };
 
 // TODO replace with mongo
-let hunts: Hunt[] = [];
+let hunts: Hunt[] = [{
+    name: 'another hunt',
+    creatorId: 'x',
+    id: 'huntidy',
+    inProgress: false,
+    ended: false,
+    createdAt: new Date(),
+}];
 
 const DefaultHuntService: HuntService = {
   getAllHunts: (creatorId: string) => {
