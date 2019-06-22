@@ -19,6 +19,12 @@ const LocationSelector = ({ defaultLocation = [0, 0], onLocationSelect }: Props)
             center: [defaultLocation[1], defaultLocation[0]],
             zoom: 9,
         })
+        map.addControl(new mapboxgl.GeolocateControl({
+            positionOptions: {
+                enableHighAccuracy: true
+            },
+            trackUserLocation: false
+        }));
         map.on('click', ({ lngLat }: { lngLat: { lat: number; lng: number } }) => {
             onLocationSelect([lngLat.lat, lngLat.lng]);
         });
