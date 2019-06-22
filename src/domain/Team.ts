@@ -3,10 +3,10 @@ export type Team = {
     name: string;
     id: string;
     place: number;
+    nextClue: number;
 };
 
 export type TeamUpdate = {
     teamId: string;
     name?: string;
-    place?: number;
 };

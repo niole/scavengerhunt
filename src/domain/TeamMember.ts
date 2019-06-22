@@ -1,5 +1,5 @@
 export type TeamMember = {
-    email?: string
+    email: string
     name: string;
     id: string;
     teamId: string;

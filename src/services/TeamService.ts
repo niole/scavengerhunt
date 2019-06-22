@@ -1,8 +1,19 @@
 import { Team, TeamUpdate } from '../domain/Team';
 import { TeamMember } from '../domain/TeamMember';
 
-let teamMembers: TeamMember[] = [];
-let teams: Team[] = [];
+let teamMembers: TeamMember[] = [{
+    email: 'niolenelson@gmail.com',
+    name: 'niole',
+    id: 'nioleid',
+    teamId: 'nioleteamid',
+}];
+let teams: Team[] = [{
+    huntId: 'huntidy',
+    name: 'TeamNiole',
+    id: 'nioleteamid',
+    place: 0,
+    nextClue: 0,
+}];
 
 type TeamService = {
   createTeam: (name: string, huntId: string) => Team;
@@ -11,6 +22,8 @@ type TeamService = {
 
   getTeam: (name: string, huntId: string) => Team | undefined;
 
+  getTeamById: (teamId: string) => Team | undefined;
+
   updateTeam: (update: TeamUpdate) => void;
 
   addTeamMembers: (teamMembers: TeamMember[]) => void;
@@ -18,6 +31,12 @@ type TeamService = {
   getTeamMembers: (teamId: string) => TeamMember[];
 
   removeTeamMember: (memberId: string) => void;
+
+  updateTeamPlace: (teamId: string, place: number) => void;
+
+  updateNextClue: (teamId: string, nextClueNumber: number) => void;
+
+  getTeamMember: (memberId: string) => TeamMember | undefined;
 };
 
 const DefaultTeamService = {
@@ -27,6 +46,7 @@ const DefaultTeamService = {
       huntId,
       id: `${Math.random()}`,
       place: 0,
+      nextClue: 0,
     };
     teams.push(newTeam);
     return newTeam;
@@ -46,7 +66,6 @@ const DefaultTeamService = {
         return {
           ...team,
           name: update.name || team.name,
-          place: update.place || team.place,
         };
       }
       return team;
@@ -63,6 +82,32 @@ const DefaultTeamService = {
 
   removeTeamMember: (memberId: string) => {
     teamMembers = teamMembers.filter((member: TeamMember) => member.id !== memberId);
+  },
+
+  updateTeamPlace: (teamId: string, place: number) => {
+    teams = teams.map((team: Team) => {
+      if (teamId === team.id) {
+        return { ...team, place };
+      }
+      return team;
+    });
+  },
+
+  updateNextClue: (teamId: string, nextClueNumber: number) => {
+    teams = teams.map((team: Team) => {
+      if (teamId === team.id) {
+        return { ...team, nextClue: nextClueNumber };
+      }
+      return team;
+    });
+  },
+
+  getTeamMember: (memberId: string) => {
+    return teamMembers.find(({ id }: TeamMember) => id === memberId);
+  },
+
+  getTeamById: (teamId: string) => {
+    return teams.find(({ id }: Team) => id === teamId);
   },
 
 };
