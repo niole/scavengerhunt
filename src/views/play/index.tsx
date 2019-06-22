@@ -7,9 +7,9 @@ import HuntService from '../../services/HuntService';
 import TeamService from '../../services/TeamService';
 import ClueSolver from './ClueSolver';
 
-const handleHuntSuccess = (history: History<any>, teamId: string) => () => {
+const handleHuntSuccess = (history: History<any>, huntId: string, teamId: string) => () => {
     TeamService.setTeamSuccess(teamId);
-    history.push(`/success/${teamId}`);
+    history.push(`/success/${huntId}/${teamId}`);
 };
 
 type TeamDetails = undefined | {
@@ -92,7 +92,7 @@ const PlayView = ({
         <div>
             {!!huntId && !!huntName && !!teamId && !!memberId && (
                 <ClueSolver
-                    handleHuntSuccess={handleHuntSuccess(history, teamId)}
+                    handleHuntSuccess={handleHuntSuccess(history, huntId, teamId)}
                     huntName={huntName}
                     huntInProgress={inProgress}
                     huntEnded={ended}
