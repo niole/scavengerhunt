@@ -1,5 +1,5 @@
 import React from 'react';
-import Dialog from '@material-ui/core/Dialog';
+import Dialog, { DialogProps } from '@material-ui/core/Dialog';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogActions from '@material-ui/core/DialogActions';
@@ -14,6 +14,7 @@ type Props<Values> = {
     onClose: () => void;
     defaultValues: Values;
     inputs: ValidatedInput<any, any, any>[][];
+    maxWidth?: DialogProps['maxWidth'];
 };
 
 function CreateEditModal<Values, Defaults>({
@@ -25,9 +26,10 @@ function CreateEditModal<Values, Defaults>({
         onConfirm,
         onClose,
         defaultValues,
+        ...dialogProps
 }: Props<Values>): JSX.Element {
     return (
-        <Dialog open={visible} onClose={onClose}>
+        <Dialog open={visible} onClose={onClose} {...dialogProps}>
             <DialogTitle>
                 {editing ? editingTitle : creatingTitle}
             </DialogTitle>

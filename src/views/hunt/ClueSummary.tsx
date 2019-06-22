@@ -1,16 +1,20 @@
 import React from 'react';
 import { LatLng, ClueUpdate } from '../../domain/Clue';
 import withToggle from '../../containers/withToggle';
-import CreateEditClueModal from './CreateEditClueModal';
+import CreateEditClueModal, { Props as ClueModalProps} from './CreateEditClueModal';
 
-const handleUpdateClue = (handleClueUpdate: (update: ClueUpdate) => void, clueId: string) => (text: string) => {
+const handleUpdateClue = (
+        handleClueUpdate: (update: ClueUpdate) => void,
+        clueId: string
+    ) => (text: string, location: LatLng) => {
     handleClueUpdate({
         text,
+        location,
         clueId
     });
 };
 
-const EditClueModal = withToggle<{ defaultText: string; onConfirm: (text: string) => void}>(props =>
+const EditClueModal = withToggle<{ defaultLocation: LatLng; defaultText: string; onConfirm: ClueModalProps['onConfirm'] }>(props =>
     <CreateEditClueModal
         {...props}
         editing={true}
@@ -35,7 +39,11 @@ const ClueSummary = ({
     return (
         <div>
             <div>
-                {name} <EditClueModal onConfirm={handleUpdateClue(handleClueUpdate, clueId)} defaultText={text} />
+                {name} <EditClueModal
+                    defaultLocation={location}
+                    onConfirm={handleUpdateClue(handleClueUpdate, clueId)}
+                    defaultText={text}
+                />
             </div>
             <div>
                 location {JSON.stringify(location)}
