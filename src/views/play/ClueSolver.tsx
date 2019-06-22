@@ -2,6 +2,7 @@ import React from 'react';
 import Button from '@material-ui/core/Button';
 import { Clue } from '../../domain/Clue';
 import ClueService from '../../services/ClueService';
+import HuntLocationService from '../../services/HuntLocationService';
 
 const solveCurrentClue = (
         setInProgressClue: (clue: Clue) => void,
@@ -10,32 +11,34 @@ const solveCurrentClue = (
         teamId: string,
         huntId: string,
     ) => () => {
-        const currentLocation = [0, 0]; // TODO
         const { location } = inProgressClue;
-        if (location[0] === currentLocation[0] && location[1] === currentLocation[1]) {
-            const shouldContinue = window.confirm('Congratulations! Continue to the next clue.');
-            if (shouldContinue) {
-                const clue = ClueService.getClueByNumber(huntId, inProgressClue.number + 1);
-                if (!!clue) {
-                    ClueService.setInProgressClue(clue.id, teamId);
-                    setInProgressClue(clue);
-                } else {
-                    // possibly over
-                    const allClues = ClueService.getClues(huntId);
-                    const sortedClues = allClues.sort((a: Clue, b: Clue) => a.number - b.number);
-                    if (sortedClues[sortedClues.length - 1].number === inProgressClue.number) {
-                        // it's over
-                        alert('Congratulations! You finished the hunt.');
-                        handleHuntSuccess();
+        HuntLocationService.canSolveClue(location)
+        .then((solved: boolean) => {
+            if (solved) {
+                const shouldContinue = window.confirm('Congratulations! Continue to the next clue.');
+                if (shouldContinue) {
+                    const clue = ClueService.getClueByNumber(huntId, inProgressClue.number + 1);
+                    if (!!clue) {
+                        ClueService.setInProgressClue(clue.id, teamId);
+                        setInProgressClue(clue);
                     } else {
-                        // there's a bug
-                        throw new Error(`Clue number: ${inProgressClue.number + 1} is missing.`);
+                        // possibly over
+                        const allClues = ClueService.getClues(huntId);
+                        const sortedClues = allClues.sort((a: Clue, b: Clue) => a.number - b.number);
+                        if (sortedClues[sortedClues.length - 1].number === inProgressClue.number) {
+                            // it's over
+                            alert('Congratulations! You finished the hunt.');
+                            handleHuntSuccess();
+                        } else {
+                            // there's a bug
+                            throw new Error(`Clue number: ${inProgressClue.number + 1} is missing.`);
+                        }
                     }
                 }
+            } else {
+                alert('Try again.');
             }
-        } else {
-            alert('Try again.');
-        }
+        });
 };
 
 const startHunting = (setInProgressClue: (clue: Clue) => void, teamId: string, huntId: string) => () => {
