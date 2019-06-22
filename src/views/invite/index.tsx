@@ -67,6 +67,6 @@ export default withDataGetter<OuterProps, InnerProps>(
         hunt: HuntService.getHunt(props.match.params.huntId),
         teams: TeamService.getTeams(props.match.params.huntId),
     }),
-    { teams: [] },
-    props => props.match.params.huntId,
+    () => ({ teams: [] }),
+    (props: OuterProps) => props.match.params.huntId,
 )(InviteView);

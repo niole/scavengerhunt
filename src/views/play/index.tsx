@@ -1,11 +1,15 @@
 import React from 'react';
+import { History } from 'history';
 import { RouteComponentProps } from 'react-router';
-import Button from '@material-ui/core/Button';
 import { LatLng } from '../../domain/LatLng';
 import withDataGetter from '../../containers/withDataGetter';
 import HuntService from '../../services/HuntService';
 import TeamService from '../../services/TeamService';
 import ClueSolver from './ClueSolver';
+
+const handleHuntSuccess = (history: History<any>, teamId: string) => () => {
+    history.push(`/success/${teamId}`);
+};
 
 type TeamDetails = undefined | {
     teamId: string;
@@ -57,6 +61,7 @@ const getHuntDetails = (huntId: string): HuntDetails => {
 
 type OuterProps = RouteComponentProps<{ huntId: string; memberId: string }>
 type Props = {
+    history: History<any>,
     huntId?: string;
     huntName?: string;
     teamId?: string;
@@ -82,6 +87,7 @@ const PlayView = ({
         huntId,
         teamId,
         memberId,
+        history,
     }: Props) => (
     <div>
         <h1>Play</h1>
@@ -89,6 +95,7 @@ const PlayView = ({
         <div>
             {!!huntId && !!huntName && !!teamId && !!memberId && (
                 <ClueSolver
+                    handleHuntSuccess={handleHuntSuccess(history, teamId)}
                     huntName={huntName}
                     huntInProgress={inProgress}
                     huntEnded={ended}
@@ -121,10 +128,11 @@ const defaultValues = {
 };
 export default withDataGetter<OuterProps, Props>(
     async (props: OuterProps) => ({
+        history: props.history,
         ...defaultValues,
         ...(getHuntDetails(props.match.params.huntId) || {}),
         ...(getTeamDetails(props.match.params.memberId) || {}),
     }),
-    defaultValues,
-    props => props.match.params.huntId,
+    (props: OuterProps) => ({ ...defaultValues, history: props.history }),
+    (props: OuterProps) => props.match.params.huntId,
 )(PlayView);

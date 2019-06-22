@@ -78,7 +78,7 @@ type OuterProps = {
 
 const dataFetcher = withDataGetter<OuterProps, { hunts: Hunt[]; creatorId: string | undefined }>(
     async ({ creatorId }) => creatorId ? { hunts: HuntService.getAllHunts(creatorId), creatorId } : { hunts: [], creatorId: undefined },
-    { hunts: [], creatorId: undefined },
+    () => ({ hunts: [], creatorId: undefined }),
     (props: OuterProps) => props.creatorId,
 );
 

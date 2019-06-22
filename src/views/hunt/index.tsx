@@ -40,7 +40,7 @@ const dataFetcher = withDataGetter<OuterProps, FetchResult>(
         clues: ClueService.getClues(props.match.params.huntId),
         creatorId: props.match.params.creatorId,
     }),
-    { clues: [] },
+    () => ({ clues: [] }),
     (props: OuterProps) => `${props.match.params.huntId}${props.match.params.creatorId}`
 );
 
