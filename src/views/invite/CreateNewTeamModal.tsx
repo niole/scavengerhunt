@@ -1,18 +1,25 @@
 import React from 'react';
 import TextField from '@material-ui/core/TextField';
+import { TeamMember } from '../../domain/TeamMember';
 import { PluggableProps } from '../../components/ValidatedForm';
 import CreateEditModal from '../../components/CreateEditModal';
 
 export type Props = {
-    editing: boolean;
+    teamMembers?: TeamMember[];
     visible: boolean;
-    onConfirm: (name: string) => void;
     onClose: () => void;
+} & NonToggleProps;
+
+export type NonToggleProps = {
+    editing: boolean;
     defaultName?: string;
+    onConfirm: (name: string) => void;
+    teamMembers?: TeamMember[];
 };
 
 type Values = {
     name?: string;
+    teamMembers: TeamMember[];
 };
 
 const handleConfirm = (onConfirm: Props['onConfirm']) => (values: Values) => {
@@ -23,18 +30,30 @@ const handleConfirm = (onConfirm: Props['onConfirm']) => (values: Values) => {
     }
 };
 
-const CreateEditClueModal = ({ defaultName, onConfirm, ...props  }: Props) => (
+const CreateEditTeamModal = ({ teamMembers = [], defaultName, onConfirm, ...props  }: Props) => (
     <CreateEditModal
         editingTitle="Edit Team"
         creatingTitle="Create A Team"
         onConfirm={handleConfirm(onConfirm)}
-        defaultValues={{ name: defaultName }}
+        defaultValues={{ name: defaultName, teamMembers }}
         {...props}
         inputs={[[
             {
                 key: 'name',
                 validator: (value?: string) => !value ? 'team must have a name' : undefined,
-                    Input: ({ value, onChange, error }: PluggableProps<any, string>) => (
+                Input: ({ value, onChange, error }: PluggableProps<any, string>) => (
+                <TextField
+                    error={error ? true : undefined}
+                    label="Team Name"
+                    value={value}
+                    onChange={(event: any) => onChange(event.target.value)}
+                />
+            )
+            }
+        ], [
+            {
+                key: 'teamMembers',
+                Input: ({ value, onChange, error }: PluggableProps<any, string>) => (
                     <TextField
                         error={error ? true : undefined}
                         label="Team Name"
@@ -46,4 +65,5 @@ const CreateEditClueModal = ({ defaultName, onConfirm, ...props  }: Props) => (
         ]]}
     />
 );
-export default CreateEditClueModal;
+
+export default CreateEditTeamModal;

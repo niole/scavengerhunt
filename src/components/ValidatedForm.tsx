@@ -18,7 +18,7 @@ export type PluggableInput<C, V> = (props: PluggableProps<C, V>) => JSX.Element;
 
 export type ValidatedInput<A, C, V> = {
     key: string;
-    validator: Validator<A>;
+    validator?: Validator<A>;
     Input: PluggableInput<C, V>;
 };
 

@@ -1,5 +1,6 @@
 import React from 'react';
 import Button from '@material-ui/core/Button';
+import { ChildComponent } from './util';
 
 type ButtonProps = {
     onClick: (event: any) => void;
@@ -12,8 +13,6 @@ type ButtonState = {
     visible?: boolean;
     children?: ButtonProps['children'];
 };
-
-type ChildComponent<O> = (outerProps: O) => JSX.Element;
 
 export type InnerProps = {
     visible: boolean;
