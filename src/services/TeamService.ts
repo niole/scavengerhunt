@@ -12,7 +12,7 @@ let teams: Team[] = [{
     name: 'TeamNiole',
     id: 'nioleteamid',
     place: 0,
-    nextClue: 0,
+    nextClue: -1,
 }];
 
 type TeamService = {
@@ -46,7 +46,7 @@ const DefaultTeamService = {
       huntId,
       id: `${Math.random()}`,
       place: 0,
-      nextClue: 0,
+      nextClue: -1,
     };
     teams.push(newTeam);
     return newTeam;

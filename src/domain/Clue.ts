@@ -1,6 +1,7 @@
 import { LatLng } from './LatLng';
 
 export type Clue = {
+    number: number;
     text: string;
     id: string;
     creatorId: string;

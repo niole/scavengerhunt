@@ -3,19 +3,38 @@ import { ClueUpdate, Clue } from '../domain/Clue';
 import { InProgressClue } from '../domain/InProgressClue';
 
 // TODO delete
-let clues: Clue[] = [{
+let clues: Clue[] = [
+  {
     text: 'This is a clue.',
     id: 'cluid',
     creatorId: 'x',
     huntId: 'huntidy',
     assetUri: undefined,
     location: [0, 0],
-}];
+    number: 0,
+  },
+  {
+    text: 'This is another  clue.',
+    id: 'cluid2',
+    creatorId: 'x',
+    huntId: 'huntidy',
+    assetUri: undefined,
+    location: [0, 0],
+    number: 1,
+  },
+];
 // TODO delete
 let inProgressClues: InProgressClue[] = [];
 
 type ClueService = {
-  createClue: (location: LatLng, text: string, huntId: string, creatorId: string) => Clue;
+  createClue: (
+    location: LatLng,
+    text: string,
+    huntId: string,
+    creatorId: string,
+    clueNumber: number,
+    assetUri?: string,
+  ) => Clue;
 
   deleteClue: (clueId: string) => void;
 
@@ -30,11 +49,25 @@ type ClueService = {
   updateClue: (update: ClueUpdate) => undefined | Clue;
 
   getClues: (huntId: string) => Clue[];
+
+  getClue: (clueId: string) => Clue | undefined;
+
+  getClueByNumber: (huntId: string, rank: number) => Clue | undefined;
+
+  setInProgressClue: (clueId: string, teamId: string) => void;
 };
 
 const DefaultClueService: ClueService = {
-  createClue: (location: LatLng, text: string, huntId: string, creatorId: string, assetUri?: string) => {
+  createClue: (
+      location: LatLng,
+      text: string,
+      huntId: string,
+      creatorId: string,
+      clueNumber: number,
+      assetUri?: string,
+    ) => {
     const newClue = {
+      number: clueNumber,
       text,
       huntId,
       creatorId,
@@ -97,6 +130,24 @@ const DefaultClueService: ClueService = {
 
   getClues: (huntId: string) => {
     return clues.filter((clue: Clue) => clue.huntId === huntId);
+  },
+
+  getClue: (clueId: string) => clues.find(({ id }: Clue) => id === clueId),
+
+  getClueByNumber: (huntId: string, rank: number) => {
+    return clues.find((clue: Clue) => clue.huntId === huntId && rank === clue.number);
+  },
+
+  setInProgressClue: (clueId: string, teamId: string) => {
+    inProgressClues = inProgressClues.map((clue: InProgressClue) => {
+       if (clue.teamId === teamId) {
+         return {
+           ...clue,
+           clueId,
+         };
+       }
+       return clue;
+    });
   },
 };
 

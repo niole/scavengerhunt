@@ -1,16 +1,19 @@
 import React from 'react';
 import { RouteComponentProps } from 'react-router';
-import { Link } from 'react-router-dom';
 import Button from '@material-ui/core/Button';
+import { LatLng } from '../../domain/LatLng';
 import withDataGetter from '../../containers/withDataGetter';
 import HuntService from '../../services/HuntService';
 import TeamService from '../../services/TeamService';
+import ClueSolver from './ClueSolver';
 
 type TeamDetails = undefined | {
     teamId: string;
     teamName: string;
     memberId: string;
     memberName: string
+    place: number;
+    nextClue: number;
 };
 const getTeamDetails = (teamMemberId: string): TeamDetails => {
     const teamMember = TeamService.getTeamMember(teamMemberId);
@@ -22,6 +25,8 @@ const getTeamDetails = (teamMemberId: string): TeamDetails => {
                 teamId: team.id,
                 teamName: team.name,
                 memberId: teamMemberId,
+                nextClue: team.nextClue,
+                place: team.place,
             };
         }
     }
@@ -33,11 +38,13 @@ type HuntDetails = undefined | {
     huntName: string;
     inProgress: boolean;
     ended: boolean;
+    startLocation: LatLng;
 };
 const getHuntDetails = (huntId: string): HuntDetails => {
     const hunt = HuntService.getHunt(huntId);
     if (!!hunt) {
         return {
+            startLocation: hunt.startLocation,
             inProgress: hunt.inProgress,
             ended: hunt.ended,
             huntId,
@@ -58,18 +65,48 @@ type Props = {
     memberName?: string;
     inProgress: boolean;
     ended: boolean;
+    startLocation?: LatLng;
+    nextClue?: number;
+    place?: number;
 };
 
-const PlayView = ({ inProgress, ended, memberName, teamName, huntName, huntId, teamId, memberId }: Props) => (
+const PlayView = ({
+        startLocation,
+        nextClue,
+        place,
+        inProgress,
+        ended,
+        memberName,
+        teamName,
+        huntName,
+        huntId,
+        teamId,
+        memberId,
+    }: Props) => (
     <div>
         <h1>Play</h1>
         <h2>Welcome {memberName} of {teamName} to {huntName}!</h2>
         <div>
-            <Button disabled={!inProgress || ended}>
-                <Link to={`/play/start/:huntId/:teamId/:memberId`}>
-                    Play {huntName}
-                </Link>
-            </Button>
+            {!!huntId && !!huntName && !!teamId && !!memberId && (
+                <ClueSolver
+                    huntName={huntName}
+                    huntInProgress={inProgress}
+                    huntEnded={ended}
+                    huntId={huntId}
+                    teamId={teamId}
+                    memberId={memberId}
+                />
+            )}
+            {!!startLocation && nextClue === -1 && (
+                <div>
+                    start location: {JSON.stringify(startLocation)}
+                </div>
+            )}
+            {nextClue !== undefined && nextClue > -1 && place !== undefined && (
+                <div>
+                    You are in place number {place}
+                </div>
+            )}
             <div>
                 {ended && 'This hunt has ended.'}
                 {!inProgress && 'This hunt isn\'t running at the moment.'}

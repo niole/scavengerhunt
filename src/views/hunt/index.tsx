@@ -10,9 +10,9 @@ import ClueService from '../../services/ClueService';
 import withDataGetter from '../../containers/withDataGetter';
 import withToggle from '../../containers/withToggle';
 import ClueSummary from './ClueSummary';
-import CreateEditClueModal from './CreateEditClueModal';
+import CreateEditClueModal, { Props as CreateClueModalProps } from './CreateEditClueModal';
 
-const CreateClueModal = withToggle<{ onConfirm: (text: string, location: LatLng) => void}>(props =>
+const CreateClueModal = withToggle<{ onConfirm: CreateClueModalProps['onConfirm'] }>(props =>
     <CreateEditClueModal
         {...props}
         editing={false}
@@ -48,8 +48,8 @@ const handleCreateClue = (
         huntId: string,
         creatorId: string,
         getData: () => void
-    ) => (clueText: string, location: LatLng) => {
-    ClueService.createClue(location, clueText, huntId, creatorId);
+    ) => (clueText: string, location: LatLng, clueNumber: number) => {
+    ClueService.createClue(location, clueText, huntId, creatorId, clueNumber);
     getData();
 };
 

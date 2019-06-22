@@ -23,7 +23,7 @@ let hunts: Hunt[] = [{
     name: 'another hunt',
     creatorId: 'x',
     id: 'huntidy',
-    inProgress: false,
+    inProgress: true,
     ended: false,
     createdAt: new Date(),
 }];
