@@ -12,10 +12,12 @@ let teams: Team[] = [{
     name: 'TeamNiole',
     id: 'nioleteamid',
     place: 0,
-    nextClue: -1,
+    done: false,
 }];
 
 type TeamService = {
+  setTeamSuccess: (teamId: string) => void;
+
   createTeam: (name: string, huntId: string) => Team;
 
   getTeams: (huntId: string) => Team[];
@@ -34,19 +36,29 @@ type TeamService = {
 
   updateTeamPlace: (teamId: string, place: number) => void;
 
-  updateNextClue: (teamId: string, nextClueNumber: number) => void;
-
   getTeamMember: (memberId: string) => TeamMember | undefined;
 };
 
 const DefaultTeamService = {
+  setTeamSuccess: (teamId: string) => {
+    teams = teams.map((team: Team) => {
+      if (team.id === teamId) {
+        return {
+          ...team,
+          done: true,
+        };
+      }
+      return team;
+    })
+  },
+
   createTeam: (name: string, huntId: string) => {
     const newTeam = {
       name,
       huntId,
       id: `${Math.random()}`,
       place: 0,
-      nextClue: -1,
+      done: false,
     };
     teams.push(newTeam);
     return newTeam;
@@ -88,15 +100,6 @@ const DefaultTeamService = {
     teams = teams.map((team: Team) => {
       if (teamId === team.id) {
         return { ...team, place };
-      }
-      return team;
-    });
-  },
-
-  updateNextClue: (teamId: string, nextClueNumber: number) => {
-    teams = teams.map((team: Team) => {
-      if (teamId === team.id) {
-        return { ...team, nextClue: nextClueNumber };
       }
       return team;
     });

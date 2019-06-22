@@ -17,21 +17,25 @@ function getData<FetchArguments, Result>(
 
 export default function withDataGetter<FetchArguments, Result extends {}>(
     fetcher: (input: FetchArguments) => Promise<Result>,
-    defaultState: (props: FetchArguments) => Result,
-    whenChanges: (props: FetchArguments) => any,
+    defaultState?: (props: FetchArguments) => Result,
+    whenChanges?: (props: FetchArguments) => any,
 ): (Component: ChildComponent<Result & DefaultChildProps>) => ChildComponent<FetchArguments> {
     return Component => props => {
-        const [result, setResult] = React.useState(defaultState(props));
+        const [result, setResult] = React.useState(defaultState ? defaultState(props) : undefined);
         React.useEffect(() => {
             fetcher(props).then(setResult).catch((error: any) => {
                 console.error(`fetch failed: ${error}`);
             });
-        }, [whenChanges(props)]);
-        return (
+        }, whenChanges ? [whenChanges(props)] : []);
+        return !!result ? (
             <Component
                 {...result}
                 getData={getData(fetcher, props, setResult)}
             />
+        ) : (
+            <div>
+                Loading...
+            </div>
         );
     };
 }

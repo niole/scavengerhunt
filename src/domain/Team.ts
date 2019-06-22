@@ -3,7 +3,8 @@ export type Team = {
     name: string;
     id: string;
     place: number;
-    nextClue: number;
+    lastSuccessfulSubmission?: Date;
+    done: boolean;
 };
 
 export type TeamUpdate = {

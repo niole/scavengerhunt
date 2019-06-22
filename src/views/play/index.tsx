@@ -8,6 +8,7 @@ import TeamService from '../../services/TeamService';
 import ClueSolver from './ClueSolver';
 
 const handleHuntSuccess = (history: History<any>, teamId: string) => () => {
+    TeamService.setTeamSuccess(teamId);
     history.push(`/success/${teamId}`);
 };
 
@@ -17,7 +18,6 @@ type TeamDetails = undefined | {
     memberId: string;
     memberName: string
     place: number;
-    nextClue: number;
 };
 const getTeamDetails = (teamMemberId: string): TeamDetails => {
     const teamMember = TeamService.getTeamMember(teamMemberId);
@@ -29,7 +29,6 @@ const getTeamDetails = (teamMemberId: string): TeamDetails => {
                 teamId: team.id,
                 teamName: team.name,
                 memberId: teamMemberId,
-                nextClue: team.nextClue,
                 place: team.place,
             };
         }
@@ -71,13 +70,11 @@ type Props = {
     inProgress: boolean;
     ended: boolean;
     startLocation?: LatLng;
-    nextClue?: number;
     place?: number;
 };
 
 const PlayView = ({
         startLocation,
-        nextClue,
         place,
         inProgress,
         ended,
@@ -104,14 +101,9 @@ const PlayView = ({
                     memberId={memberId}
                 />
             )}
-            {!!startLocation && nextClue === -1 && (
+            {!!startLocation && (
                 <div>
                     start location: {JSON.stringify(startLocation)}
-                </div>
-            )}
-            {nextClue !== undefined && nextClue > -1 && place !== undefined && (
-                <div>
-                    You are in place number {place}
                 </div>
             )}
             <div>
