@@ -1,4 +1,4 @@
-export type LatLng = [number, number];
+import { LatLng } from './LatLng';
 
 export type Clue = {
     text: string;

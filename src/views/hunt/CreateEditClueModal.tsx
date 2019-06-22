@@ -1,9 +1,9 @@
 import React from 'react';
-import { LatLng } from '../../domain/Clue';
+import { LatLng } from '../../domain/LatLng';
 import TextField from '@material-ui/core/TextField';
 import { PluggableProps } from '../../components/ValidatedForm';
 import CreateEditModal from '../../components/CreateEditModal';
-import LocationSelector from './LocationSelector';
+import LocationSelector from '../../components/LocationSelector';
 
 export type Props = {
     editing: boolean;
@@ -38,6 +38,7 @@ const CreateEditClueModal = ({ defaultText, defaultLocation, onConfirm, ...props
                     <TextField
                         error={error ? true : undefined}
                         label="New Clue"
+                        margin="normal"
                         value={value}
                         onChange={(event: any) => onChange(event.target.value)}
                     />
@@ -49,6 +50,7 @@ const CreateEditClueModal = ({ defaultText, defaultLocation, onConfirm, ...props
                 validator: (value?: LatLng) => !value ? 'Must choose location' : undefined,
                     Input: ({ value, onChange, error }: PluggableProps<any, LatLng>) => (
                     <LocationSelector
+                        error={error}
                         defaultLocation={value}
                         onLocationSelect={onChange}
                     />

@@ -1,5 +1,6 @@
 import React from 'react';
-import { LatLng, ClueUpdate } from '../../domain/Clue';
+import { LatLng } from '../../domain/LatLng';
+import { ClueUpdate } from '../../domain/Clue';
 import withToggle from '../../containers/withToggle';
 import CreateEditClueModal, { Props as ClueModalProps} from './CreateEditClueModal';
 

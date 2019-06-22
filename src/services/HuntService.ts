@@ -1,3 +1,4 @@
+import { LatLng } from '../domain/LatLng';
 import { Hunt } from '../domain/Hunt';
 
 type HuntService = {
@@ -5,7 +6,7 @@ type HuntService = {
 
   getHunt: (huntId: string) => Hunt | undefined;
 
-  createHunt: (name: string, creatorId: string) => Hunt;
+  createHunt: (name: string, creatorId: string, startLocation: LatLng) => Hunt;
 
   deleteHunt: (huntId: string) => void;
 
@@ -18,6 +19,7 @@ type HuntService = {
 
 // TODO replace with mongo
 let hunts: Hunt[] = [{
+    startLocation: [0, 0],
     name: 'another hunt',
     creatorId: 'x',
     id: 'huntidy',
@@ -33,8 +35,9 @@ const DefaultHuntService: HuntService = {
 
   getHunt: (huntId: string) => hunts.find((hunt: Hunt) => hunt.id === huntId),
 
-  createHunt: (name: string, creatorId: string) => {
+  createHunt: (name: string, creatorId: string, startLocation: LatLng) => {
     const newHunt = {
+      startLocation,
       name,
       creatorId,
       id: `${Math.random()}`,

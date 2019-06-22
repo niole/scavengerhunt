@@ -1,4 +1,5 @@
-import { ClueUpdate, Clue, LatLng } from '../domain/Clue';
+import { LatLng } from '../domain/LatLng';
+import { ClueUpdate, Clue } from '../domain/Clue';
 import { InProgressClue } from '../domain/InProgressClue';
 
 // TODO delete

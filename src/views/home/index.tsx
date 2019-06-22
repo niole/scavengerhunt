@@ -1,5 +1,6 @@
 import React from 'react';
 
+import { LatLng } from '../../domain/LatLng';
 import { Hunt } from '../../domain/Hunt';
 import HuntService from '../../services/HuntService';
 
@@ -11,9 +12,10 @@ import DialogActions from '@material-ui/core/DialogActions';
 import TextField from '@material-ui/core/TextField';
 import HuntSummary from './HuntSummary';
 import ValidatedForm, { PluggableProps } from '../../components/ValidatedForm';
+import LocationSelector from '../../components/LocationSelector';
 import withToggle from '../../containers/withToggle';
 
-const Modal = withToggle<{ onConfirm: (name: string) => void}>(props => (
+const Modal = withToggle<{ onConfirm: (name: string, location: LatLng) => void}>(props => (
     <Dialog open={props.visible} onClose={props.onClose}>
         <DialogTitle>
             Create A Hunt
@@ -29,17 +31,30 @@ const Modal = withToggle<{ onConfirm: (name: string) => void}>(props => (
                             <TextField
                                 error={error ? true : undefined}
                                 label="Name"
+                                margin="normal"
                                 value={value}
                                 onChange={(event: any) => onChange(event.target.value)}
                             />
                         )
                     }
+                ], [
+                   {
+                       key: 'location',
+                       validator: (value: string) => !value ? 'must pick a start location' : undefined,
+                           Input: ({ value, onChange, error }: PluggableProps<any, LatLng>) => (
+                            <LocationSelector
+                               error={error}
+                               defaultLocation={value}
+                               onLocationSelect={onChange}
+                            />
+                       )
+                   }
                 ]]}
-                onSubmit={async ({ name }: { name: string | undefined }) => {
-                    if (!name) {
-                        throw new Error('Must provide name for hunt');
+                onSubmit={async ({ name, location }: { location?: LatLng, name?: string }) => {
+                    if (!name || !location) {
+                        throw new Error('Must provide name and start location for hunt');
                     } else {
-                        props.onConfirm(name);
+                        props.onConfirm(name, location);
                         props.onClose();
                     }
                     return;
@@ -67,8 +82,8 @@ const dataFetcher = withDataGetter<OuterProps, { hunts: Hunt[]; creatorId: strin
     (props: OuterProps) => props.creatorId,
 );
 
-const handleHuntCreate = (creatorId: string, setHunts: () => void) => (name: string) => {
-    HuntService.createHunt(name, creatorId);
+const handleHuntCreate = (creatorId: string, setHunts: () => void) => (name: string, location: LatLng) => {
+    HuntService.createHunt(name, creatorId, location);
     setHunts();
 };
 

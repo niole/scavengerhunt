@@ -8,7 +8,7 @@ import Invite from './views/invite';
 const routes = () => (
   <Router>
     <Switch>
-      <Route exact path="/home" component={Home} />
+      <Route exact path="/create" component={Home} />
       <Route exact path="/hunt/:huntId/:creatorId" component={Hunt} />
       <Route exact path="/invite/:huntId/:creatorId" component={Invite} />
     </Switch>
