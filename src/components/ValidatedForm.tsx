@@ -83,8 +83,8 @@ class ValidatedForm<V extends { [key: string]: any }> extends React.PureComponen
 
     handleInputChange = (key: string, validator: Validator<any>) => (event: any) => {
         this.setState({ submitError: undefined });
+        const { values, errors } = this.state;
         if (validator) {
-            const { values, errors } = this.state;
             const errorMessage = validator(event);
             if (!!errorMessage) {
                 this.setState({
@@ -101,6 +101,10 @@ class ValidatedForm<V extends { [key: string]: any }> extends React.PureComponen
                     values: { ...values, [key]: event },
                 });
             }
+        } else {
+            this.setState({
+                values: { ...values, [key]: event },
+            });
         }
     }
 

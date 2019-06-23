@@ -4,3 +4,8 @@ export type TeamMember = {
     id: string;
     teamId: string;
 };
+
+export type NewTeamMember = {
+    email: string
+    name: string;
+};

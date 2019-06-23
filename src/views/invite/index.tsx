@@ -4,6 +4,7 @@ import withToggle from '../../containers/withToggle';
 import withDataGetter from '../../containers/withDataGetter';
 import { Hunt } from '../../domain/Hunt';
 import { Team } from '../../domain/Team';
+import { NewTeamMember } from '../../domain/TeamMember';
 import HuntService from '../../services/HuntService';
 import TeamService from '../../services/TeamService';
 import CreateNewTeamModal, { NonToggleProps } from './CreateNewTeamModal';
@@ -39,16 +40,25 @@ type InnerProps = {
     hunt?: Hunt;
 };
 
-const handleUpdateTeamName = (teamId: string, dataGetter: () => void) => (newName: string) => {
+const handleUpdateTeamName = (teamId: string, dataGetter: () => void) =>
+    (newName: string, teamMembers: NewTeamMember[]) => {
     TeamService.updateTeam({
         teamId,
         name: newName,
     });
+    TeamService.setTeamMembers(
+        teamId,
+        teamMembers,
+    );
     dataGetter();
 };
 
-const handleCreateTeam = (huntId: string, dataGetter: () => void) => (name: string) => {
-    TeamService.createTeam(name, huntId);
+const handleCreateTeam = (huntId: string, dataGetter: () => void) => (name: string, teamMembers: NewTeamMember[]) => {
+    const team = TeamService.createTeam(name, huntId);
+    TeamService.setTeamMembers(
+        team.id,
+        teamMembers,
+    );
     dataGetter();
 };
 

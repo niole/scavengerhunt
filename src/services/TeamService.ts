@@ -1,5 +1,5 @@
 import { Team, TeamUpdate } from '../domain/Team';
-import { TeamMember } from '../domain/TeamMember';
+import { NewTeamMember, TeamMember } from '../domain/TeamMember';
 
 let teamMembers: TeamMember[] = [{
     email: 'niolenelson@gmail.com',
@@ -28,7 +28,7 @@ type TeamService = {
 
   updateTeam: (update: TeamUpdate) => void;
 
-  addTeamMembers: (teamMembers: TeamMember[]) => void;
+  setTeamMembers: (teamId: string, teamMembers: NewTeamMember[]) => void;
 
   getTeamMembers: (teamId: string) => TeamMember[];
 
@@ -84,12 +84,17 @@ const DefaultTeamService = {
     });
   },
 
-  addTeamMembers: (newTeamMembers: TeamMember[]) => {
-    teamMembers = [...teamMembers, ...newTeamMembers];
+  setTeamMembers: (teamId: string, newTeamMembers: NewTeamMember[]) => {
+    teamMembers = teamMembers.filter((member: TeamMember) => member.teamId !== teamId);
+    teamMembers = [...teamMembers, ...newTeamMembers.map((newMember: NewTeamMember) => ({
+      ...newMember,
+      teamId,
+      id: `${Math.random()}`,
+    }))];
   },
 
   getTeamMembers: (teamId: string) => {
-    return teamMembers.filter((member: TeamMember) => member.id === teamId);
+    return teamMembers.filter((member: TeamMember) => member.teamId === teamId);
   },
 
   removeTeamMember: (memberId: string) => {
