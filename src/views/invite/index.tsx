@@ -9,22 +9,10 @@ import HuntService from '../../services/HuntService';
 import TeamService from '../../services/TeamService';
 import CreateNewTeamModal, { NonToggleProps } from './CreateNewTeamModal';
 
-type WithTeamsProps = NonToggleProps & { teamId?: string };
-const withTeams = withDataGetter<WithTeamsProps, NonToggleProps>(
-    async (props: WithTeamsProps) => {
-        return {
-            ...props,
-            teamMembers: props.teamId ?
-                TeamService.getTeamMembers(props.teamId) :
-                [],
-        };
-    }
-);
-
-const EditTeamModal = withTeams(withToggle<NonToggleProps>(CreateNewTeamModal)(
+const EditTeamModal = withToggle<NonToggleProps>(CreateNewTeamModal)(
     ({ onClick, children }) => <span onClick={onClick}>{children}</span>,
     { children: 'edit' }
-));
+);
 
 const CreateTeamModal = withToggle<NonToggleProps>(CreateNewTeamModal)(
     undefined,
@@ -70,6 +58,7 @@ const InviteView = ({ hunt = {} as Hunt, teams, getData }: Props) => (
             editing={false}
             onConfirm={handleCreateTeam(hunt.id || '', getData)}
         />
+
         <div>
             {!teams.length && 'Add a team'}
             {teams.map((team: Team) => (
