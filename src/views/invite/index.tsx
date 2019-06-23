@@ -1,5 +1,6 @@
 import React from 'react';
 import { RouteComponentProps } from 'react-router';
+import Button from '@material-ui/core/Button';
 import withToggle from '../../containers/withToggle';
 import withDataGetter from '../../containers/withDataGetter';
 import { Hunt } from '../../domain/Hunt';
@@ -8,6 +9,10 @@ import { NewTeamMember } from '../../domain/TeamMember';
 import HuntService from '../../services/HuntService';
 import TeamService from '../../services/TeamService';
 import CreateNewTeamModal, { NonToggleProps } from './CreateNewTeamModal';
+
+const emailTeams = (huntId: string) => () => {
+    console.log('email teams for hunt ', huntId);
+};
 
 const EditTeamModal = withToggle<NonToggleProps>(CreateNewTeamModal)(
     ({ onClick, children }) => <span onClick={onClick}>{children}</span>,
@@ -58,7 +63,9 @@ const InviteView = ({ hunt = {} as Hunt, teams, getData }: Props) => (
             editing={false}
             onConfirm={handleCreateTeam(hunt.id || '', getData)}
         />
-
+        <Button onClick={emailTeams(hunt.id || '')} disabled={teams.length === 0}>
+            Email Teams
+        </Button>
         <div>
             {!teams.length && 'Add a team'}
             {teams.map((team: Team) => (
