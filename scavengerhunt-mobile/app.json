@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Scavenger Hunt",
-    "slug": "scavengerhunt-mobile",
+    "slug": "scavengerhunt",
     "privacy": "public",
     "sdkVersion": "33.0.0",
     "platforms": [
@@ -23,8 +23,18 @@
     "assetBundlePatterns": [
       "**/*"
     ],
+    "android": {
+      "package": "com.niole.scavengerhunt",
+      "permissions": [
+        "android.permission.ACCESS_FINE_LOCATION",
+      ],
+    },
     "ios": {
-      "supportsTablet": true
+      "bundleIdentifier": "com.niole.scavengerhunt",
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "location for maps"
+      },
     }
   }
 }

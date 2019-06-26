@@ -1,17 +1,18 @@
 import React from 'react';
+import Geolocation from 'react-native-geolocation-service';
 import { View, StyleSheet } from 'react-native';
 import TextField from './TextField';
 
 import { LatLng } from '../domain/LatLng';
-import MapboxGL from '@react-native-mapbox-gl/maps';
+import MapView from 'react-native-maps';
 
 const styles = StyleSheet.create({
-    matchParent: { flex: 1 }
+    map: { margin: 5, height: 400 },
 });
 
 const handlePress = (onLocationSelect: Props['onLocationSelect'], setLocation: (loc: LatLng) => void) => (event: any) => {
-    const { geometry } = event;
-    const newLocation: LatLng = [geometry.coordinates[1], geometry.coordinates[0]];
+    const { coordinate } = event.nativeEvent;
+    const newLocation: LatLng = [coordinate.latitude, coordinate.longitude];
     setLocation(newLocation);
     onLocationSelect(newLocation)
 };
@@ -38,10 +39,6 @@ const DefaultContainer = ({ error, label, location }: SelectedLocationContainerP
     />
 );
 
-const mapStyle = { height: 400, width: 400 };
-
-// mapboxgl.accessToken = process.env.REACT_APP_MAPS_TOKEN_READ_ONLY;
-
 type Props = {
     error?: any;
     SelectedLocationContainer?: (props: SelectedLocationContainerProps) => JSX.Element;
@@ -56,15 +53,37 @@ const LocationSelector = ({
         error,
     }: Props) => {
     const [location, setLocation] = React.useState(defaultLocation || [0, 0] as LatLng);
-    //            <MapboxGL.MapView
-    //                style={styles}
-    //                centerCoordinate={[location[1], location[0]]}
-    //                onPress={handlePress(onLocationSelect, setLocation)}
-    //            />
-    //<View style={mapStyle} id="location-selector-map"/>
-
+    React.useEffect(() => {
+    navigator.geolocation.getCurrentPosition(
+            ({ coords }) => {
+                setLocation([coords.latitude, coords.longitude])
+            },
+            (error: any) => {
+                // See error code charts below.
+                console.log(error.code, error.message);
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 15000,
+                maximumAge: 10000,
+            }
+        );
+    }, []);
     return (
         <View>
+            <MapView
+                initialRegion={{
+                    latitude: location[0],
+                    longitude: location[1],
+                    latitudeDelta: 0.0922,
+                    longitudeDelta: 0.0421,
+                }}
+                style={styles.map}
+                showsMyLocationButton={true}
+                onPress={handlePress(onLocationSelect, setLocation)}
+                showsUserLocation={true}
+                zoomControlEnabled={true}
+            />
             <SelectedLocationContainer
                 error={error}
                 label="Currently Selected Location"
