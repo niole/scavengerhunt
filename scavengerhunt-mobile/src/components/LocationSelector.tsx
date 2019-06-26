@@ -52,11 +52,12 @@ const LocationSelector = ({
         onLocationSelect,
         error,
     }: Props) => {
-    const [location, setLocation] = React.useState(defaultLocation || [0, 0] as LatLng);
+        const [location, setLocation] = React.useState(defaultLocation);
+        const [defaultState, setDefaultState] = React.useState([0, 0] as LatLng);
     React.useEffect(() => {
-    navigator.geolocation.getCurrentPosition(
+        navigator.geolocation.getCurrentPosition(
             ({ coords }) => {
-                setLocation([coords.latitude, coords.longitude])
+                setDefaultState([coords.latitude, coords.longitude])
             },
             (error: any) => {
                 // See error code charts below.
@@ -69,12 +70,13 @@ const LocationSelector = ({
             }
         );
     }, []);
+    const renderedLocation = location || defaultState;
     return (
         <View>
             <MapView
                 initialRegion={{
-                    latitude: location[0],
-                    longitude: location[1],
+                    latitude: renderedLocation[0],
+                    longitude: renderedLocation[1],
                     latitudeDelta: 0.0922,
                     longitudeDelta: 0.0421,
                 }}
