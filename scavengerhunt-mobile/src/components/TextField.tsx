@@ -1,5 +1,5 @@
 import * as React from "react";
-import { TextInput, View, Text } from "react-native";
+import { TextField } from 'react-native-ui-lib';
 
 type Props = {
     error?: any;
@@ -11,7 +11,7 @@ type Props = {
     placeholder?: string;
 };
 
-const TextField = ({
+const Input = ({
         placeholder,
         error,
         label,
@@ -19,16 +19,13 @@ const TextField = ({
         onChange,
         InputProps,
     }: Props) => (
-    <View>
-        <Text>
-            label: {label}, error: {error}
-        </Text>
-        <TextInput
-            placeholder={placeholder}
-            onChange={onChange}
-            value={value}
-        />
-    </View>
+    <TextField
+        title={label}
+        error={error}
+        placeholder={placeholder}
+        onChange={onChange}
+        value={value}
+    />
 );
 
-export default TextField;
+export default Input;

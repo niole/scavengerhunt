@@ -1,5 +1,6 @@
 import React from 'react';
-import { Text, View, Button } from "react-native";
+import { Text, View } from "react-native";
+import Button from './Button';
 
 const DefaultActionsContainer = View;
 
@@ -131,8 +132,12 @@ class ValidatedForm<V extends { [key: string]: any }> extends React.PureComponen
                 <ActionsContainer>
                     <View>
                         <Error message={submitError} />
-                        <Button title="Cancel" onPress={onCancel} />
-                        <Button title="Submit" disabled={disableSubmit} onPress={this.onSubmit} />
+                        <Button  onClick={onCancel}>
+                            Cancel
+                        </Button>
+                        <Button disabled={disableSubmit} onClick={this.onSubmit}>
+                            Submit
+                        </Button>
                     </View>
                 </ActionsContainer>
             </View>

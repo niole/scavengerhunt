@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Button } from 'react-native';
+import { Button } from 'react-native-ui-lib';
 
 type Props = {
     children: string;
@@ -13,7 +13,7 @@ const AppButton = ({
     disabled,
 }: Props) => (
     <Button
-        title={children}
+        label={children}
         onPress={onClick}
         disabled={disabled}
     />
