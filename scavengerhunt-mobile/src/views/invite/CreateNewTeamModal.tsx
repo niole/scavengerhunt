@@ -75,10 +75,10 @@ const CreateEditTeamModal = ({ defaultName, onConfirm, ...props  }: Props) => {
                             onCreateTag={(email: string) => {
                                 onChange([...value, { name: email, email }]);
                             }}
-                            onTagPress={(email: string) => {
-                                onChange(
-                                    value.filter((teamMember: NewTeamMember) => email !== teamMember.email)
-                                );
+                            onTagPress={(index: number) => {
+                                const newValue = [...value];
+                                newValue.splice(index, 1);
+                                onChange(newValue);
                             }}
                         />
                     )
