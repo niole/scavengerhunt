@@ -3,6 +3,7 @@ import { Text, View } from 'react-native';
 import { LatLng } from '../../domain/LatLng';
 import { ClueUpdate } from '../../domain/Clue';
 import withToggle from '../../containers/withToggle';
+import Card from '../../components/Card';
 import CreateEditClueModal, { Props as ClueModalProps} from './CreateEditClueModal';
 
 const handleUpdateClue = (
@@ -39,24 +40,26 @@ const ClueSummary = ({
         handleClueUpdate,
     }: Props) => {
     return (
-        <View>
+        <Card>
             <View>
-                <Text>{name}</Text>
-                <EditClueModal
-                    defaultLocation={location}
-                    onConfirm={handleUpdateClue(handleClueUpdate, clueId)}
-                    defaultText={text}
-                />
+                <View>
+                    <Text>{name}</Text>
+                    <EditClueModal
+                        defaultLocation={location}
+                        onConfirm={handleUpdateClue(handleClueUpdate, clueId)}
+                        defaultText={text}
+                    />
+                </View>
+                <Text>
+                    <Text>
+                        location {JSON.stringify(location)}
+                    </Text>
+                    <Text>
+                        {text}
+                    </Text>
+                </Text>
             </View>
-            <Text>
-                <Text>
-                    location {JSON.stringify(location)}
-                </Text>
-                <Text>
-                    {text}
-                </Text>
-            </Text>
-        </View>
+        </Card>
     );
 };
 

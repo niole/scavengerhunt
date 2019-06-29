@@ -1,5 +1,4 @@
 import React from 'react';
-import Geolocation from 'react-native-geolocation-service';
 import { View, StyleSheet } from 'react-native';
 import TextField from './TextField';
 
@@ -54,27 +53,28 @@ const LocationSelector = ({
     }: Props) => {
         const [location, setLocation] = React.useState(defaultLocation);
         const [defaultState, setDefaultState] = React.useState([0, 0] as LatLng);
-    React.useEffect(() => {
-        navigator.geolocation.getCurrentPosition(
-            ({ coords }) => {
-                setDefaultState([coords.latitude, coords.longitude])
-            },
-            (error: any) => {
-                // See error code charts below.
-                console.log(error.code, error.message);
-            },
-            {
-                enableHighAccuracy: true,
-                timeout: 15000,
-                maximumAge: 10000,
+        React.useEffect(() => {
+            if (!defaultLocation) {
+                navigator.geolocation.getCurrentPosition(
+                    ({ coords }) => {
+                        setDefaultState([coords.latitude, coords.longitude])
+                    },
+                    (error: any) => {
+                        console.error(error);
+                    },
+                    {
+                        enableHighAccuracy: true,
+                        timeout: 1000,
+                        maximumAge: 10000,
+                    }
+                );
             }
-        );
-    }, []);
+        }, []);
     const renderedLocation = location || defaultState;
     return (
         <View>
             <MapView
-                initialRegion={{
+                region={{
                     latitude: renderedLocation[0],
                     longitude: renderedLocation[1],
                     latitudeDelta: 0.0922,

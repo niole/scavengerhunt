@@ -1,6 +1,6 @@
 import React from 'react';
 import { Text } from 'react-native';
-import { Card } from 'react-native-ui-lib';
+import Card from '../../components/Card';
 
 type Props = {
     name: string;
@@ -10,14 +10,7 @@ type Props = {
 };
 
 const HuntSummary = ({ onClick, name, huntId, creatorId }: Props) => (
-    <Card
-        enableShadowa={true}
-        onPress={() => onClick(huntId, creatorId)}
-        style={{ margin: 20, padding: 20 }}
-    >
-        <Text>
-            hunt
-        </Text>
+    <Card onPress={() => onClick(huntId, creatorId)} title="hunt">
         <Text>
             {name}
         </Text>
