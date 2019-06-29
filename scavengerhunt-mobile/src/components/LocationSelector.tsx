@@ -96,4 +96,3 @@ const LocationSelector = ({
 };
 
 export default LocationSelector;
-

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Text, View } from "react-native";
+import ActionBar from './ActionBar';
 import Button from './Button';
 
 const DefaultActionsContainer = View;
@@ -132,12 +133,19 @@ class ValidatedForm<V extends { [key: string]: any }> extends React.PureComponen
                 <ActionsContainer>
                     <View>
                         <Error message={submitError} />
-                        <Button  onClick={onCancel}>
-                            Cancel
-                        </Button>
-                        <Button disabled={disableSubmit} onClick={this.onSubmit}>
-                            Submit
-                        </Button>
+                        <ActionBar totalActions={2}>
+                            {props => <Button onClick={onCancel} {...props} key="cancel">
+                                Cancel
+                            </Button>}
+                            {props => <Button
+                                key="submit"
+                                disabled={disableSubmit}
+                                onClick={this.onSubmit}
+                                {...props}
+                            >
+                                Submit
+                            </Button>}
+                        </ActionBar>
                     </View>
                 </ActionsContainer>
             </View>

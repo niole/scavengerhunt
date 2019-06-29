@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text } from 'react-native';
 import { NavigationScreenProp } from 'react-navigation';
+import ActionBar from '../../components/ActionBar';
 import Button from '../../components/Button';
 import { LatLng } from '../../domain/LatLng';
 import { Clue, ClueUpdate } from '../../domain/Clue';
@@ -19,7 +20,7 @@ type NavigationProps = {
     }>;
 };
 
-const CreateClueModal = withToggle<{ onConfirm: CreateClueModalProps['onConfirm'] }>(props =>
+const CreateClueModal = withToggle<{ buttonProps?: any; onConfirm: CreateClueModalProps['onConfirm'] }>(props =>
     <CreateEditClueModal
         {...props}
         editing={false}
@@ -83,18 +84,18 @@ const getHuntLifeCycleButtonProps = (dataGetter: () => void, hunt?: Hunt) => {
         if (hunt.inProgress && !hunt.ended) {
             return {
                 onClick: handleStopHunt(hunt.id, dataGetter),
-                children: 'Stop Hunt',
+                children: 'Stop',
             };
         }
         if (!hunt.inProgress && !hunt.ended) {
             return {
                 onClick: handleStartHunt(hunt.id, dataGetter),
-                children: 'Start Hunt',
+                children: 'Start',
             };
         }
     }
     return {
-        children: 'Start Hunt',
+        children: 'Start',
         disabled: true,
     };
 };
@@ -105,22 +106,27 @@ const inviteTeams = (navigation: NavigationProps['navigation'], huntId: string, 
 
 const HuntView = ({ navigation, hunt = {} as Hunt, clues, creatorId, getData }: Props) => (
     <View>
-        <Text>
-            <Text>Hunt</Text> <Text>{hunt.name || ''}</Text>
-        </Text>
-        <View>
-            <View>
+        <ActionBar totalActions={4}>
+            {() => (
                 <CreateClueModal
+                    buttonProps={{ style: { height: 40 }, fullWidth: true }}
                     onConfirm={handleCreateClue(hunt.id || '', creatorId || '', getData)}
                 />
-                <Button onClick={inviteTeams(navigation, hunt.id, creatorId)}>
-                    Invite Teams
-                </Button>
-                <Button {...getHuntLifeCycleButtonProps(getData, hunt)} />
-                <Button disabled={!hunt.inProgress} onClick={handleEndHunt(hunt.id || '', getData)}>
-                    End Hunt
-                </Button>
-            </View>
+            )}
+            {props => <Button onClick={inviteTeams(navigation, hunt.id, creatorId)} {...props}>
+                Invite
+            </Button>}
+            {props => <Button {...getHuntLifeCycleButtonProps(getData, hunt)} {...props} />}
+            {props => <Button disabled={!hunt.inProgress} onClick={handleEndHunt(hunt.id || '', getData)} {...props}>
+                End
+            </Button>}
+        </ActionBar>
+        <View>
+            <Text>
+                <Text>Hunt</Text> <Text>{hunt.name || ''}</Text>
+            </Text>
+        </View>
+        <View>
             {!clues.length && (
                 <Text>
                     Add some clues
