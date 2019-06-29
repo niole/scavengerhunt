@@ -28,6 +28,8 @@ type TeamService = {
 
   updateTeam: (update: TeamUpdate) => void;
 
+  removeTeam: (teamId: string) => void;
+
   setTeamMembers: (teamId: string, teamMembers: NewTeamMember[]) => void;
 
   getTeamMembers: (teamId: string) => TeamMember[];
@@ -95,6 +97,11 @@ const DefaultTeamService = {
 
   getTeamMembers: (teamId: string) => {
     return teamMembers.filter((member: TeamMember) => member.teamId === teamId);
+  },
+
+  removeTeam: (teamId: string) => {
+    teams = teams.filter((team: Team) => team.id !== teamId);
+    teamMembers = teamMembers.filter((tm: TeamMember) => tm.teamId !== teamId);
   },
 
   removeTeamMember: (memberId: string) => {

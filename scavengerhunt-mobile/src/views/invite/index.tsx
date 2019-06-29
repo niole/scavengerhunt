@@ -63,6 +63,11 @@ const handleCreateTeam = (huntId: string, dataGetter: () => void) => (name: stri
     dataGetter();
 };
 
+const handleDeleteTeam = (teamId: string, getData: () => void) => () => {
+    TeamService.removeTeam(teamId);
+    getData();
+};
+
 const InviteView = ({ hunt = {} as Hunt, teams, getData }: Props) => (
     <MainView>
         <ActionBar>
@@ -78,14 +83,23 @@ const InviteView = ({ hunt = {} as Hunt, teams, getData }: Props) => (
         <Text h2>{`Invite teams to play ${hunt.name}`}</Text>
         <View>
             {teams.map((team: Team) => (
-                <Card title={team.name} key={team.id}>
-                    <EditTeamModal
-                        teamId={team.id}
-                        editing={true}
-                        onConfirm={handleUpdateTeamName(team.id, getData)}
-                        defaultName={team.name}
-                    />
-                </Card>
+                <Card
+                    title={team.name}
+                    key={team.id}
+                    footer={
+                        <>
+                            <EditTeamModal
+                                teamId={team.id}
+                                editing={true}
+                                onConfirm={handleUpdateTeamName(team.id, getData)}
+                                defaultName={team.name}
+                            />
+                            <Button onClick={handleDeleteTeam(team.id, getData)} fullWidth={true}>
+                                Delete
+                            </Button>
+                        </>
+                    }
+                />
             ))}
         </View>
     </MainView>
