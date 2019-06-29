@@ -3,7 +3,7 @@ import { View, StyleSheet } from 'react-native';
 import TextField from './TextField';
 
 import { LatLng } from '../domain/LatLng';
-import MapView from 'react-native-maps';
+import MapView, { Marker } from 'react-native-maps';
 
 const styles = StyleSheet.create({
     map: { margin: 5, height: 400 },
@@ -85,7 +85,9 @@ const LocationSelector = ({
                 onPress={handlePress(onLocationSelect, setLocation)}
                 showsUserLocation={true}
                 zoomControlEnabled={true}
-            />
+            >
+                {location ? <Marker coordinate={{ longitude: location[1], latitude: location[0] }} /> : null}
+            </MapView>
             <SelectedLocationContainer
                 error={error}
                 label="Currently Selected Location"
