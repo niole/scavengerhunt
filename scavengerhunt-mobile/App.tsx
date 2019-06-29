@@ -1,5 +1,6 @@
 import * as React from "react";
 import { createStackNavigator, createAppContainer } from "react-navigation";
+import './src/style/typography';
 import Home from './src/views/home';
 import Hunt from './src/views/hunt';
 import Invite from './src/views/invite';

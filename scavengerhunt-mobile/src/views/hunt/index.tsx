@@ -1,7 +1,8 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { Text, View } from 'react-native-ui-lib';
 import { NavigationScreenProp } from 'react-navigation';
 import ActionBar from '../../components/ActionBar';
+import MainView from '../../components/MainView';
 import Button from '../../components/Button';
 import { LatLng } from '../../domain/LatLng';
 import { Clue, ClueUpdate } from '../../domain/Clue';
@@ -25,7 +26,7 @@ const CreateClueModal = withToggle<{ buttonProps?: any; onConfirm: CreateClueMod
         {...props}
         editing={false}
     />
-)(undefined, { children: 'Create New Clue' });
+)(undefined, { children: 'Add Clue' });
 
 type OuterProps = NavigationProps;
 
@@ -121,14 +122,9 @@ const HuntView = ({ navigation, hunt = {} as Hunt, clues, creatorId, getData }: 
                 End
             </Button>}
         </ActionBar>
-        <View>
-            <Text>
-                <Text>Hunt</Text> <Text>{hunt.name || ''}</Text>
-            </Text>
-        </View>
-        <View>
+        <MainView title={hunt.name}>
             {!clues.length && (
-                <Text>
+                <Text h1>
                     Add some clues
                 </Text>
             )}
@@ -142,7 +138,7 @@ const HuntView = ({ navigation, hunt = {} as Hunt, clues, creatorId, getData }: 
                     handleClueUpdate={handleUpdateClue(getData)}
                 />
             ))}
-        </View>
+        </MainView>
     </View>
 );
 

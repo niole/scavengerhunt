@@ -1,11 +1,12 @@
 import * as React from "react";
 import { NavigationScreenProp } from 'react-navigation';
-import { View, Text } from "react-native";
+import { View } from "react-native-ui-lib";
 import { LatLng } from '../../domain/LatLng';
 import { Hunt } from '../../domain/Hunt';
 import HuntService from '../../services/HuntService';
 
 import withDataGetter from '../../containers/withDataGetter';
+import MainView from '../../components/MainView';
 import Dialog from '../../components/Dialog';
 import TextField from '../../components/TextField';
 import HuntSummary from './HuntSummary';
@@ -13,12 +14,9 @@ import ValidatedForm, { PluggableProps } from '../../components/ValidatedForm';
 import LocationSelector from '../../components/LocationSelector';
 import withToggle from '../../containers/withToggle';
 
-const Modal = withToggle<{ onConfirm: (name: string, location: LatLng) => void}>(props => (
-    <Dialog open={props.visible} onClose={props.onClose}>
-        <Text>
-            Create A Hunt
-        </Text>
-        <View>
+const Modal = withToggle<{ buttonProps?: any; onConfirm: (name: string, location: LatLng) => void}>(props => (
+    <Dialog open={props.visible} onClose={props.onClose} title="Create A Hunt">
+        <View paddingT-24>
             <ValidatedForm
                 ActionsContainer={View}
                 inputs={[[
@@ -96,9 +94,9 @@ const handleNavigate = (navigation: NavigationProps['navigation']) => (huntId: s
 };
 
 const Home = ({ navigation, hunts, creatorId = '', getData }: Props) => (
-    <View>
-        <Modal onConfirm={handleHuntCreate(creatorId, getData)}/>
-        <View>
+    <MainView>
+        <Modal onConfirm={handleHuntCreate(creatorId, getData)} buttonProps={{ fullWidth: true }}/>
+        <View paddingT-24>
             {hunts.map((hunt: Hunt) => (
                 <HuntSummary
                     key={hunt.id}
@@ -109,7 +107,7 @@ const Home = ({ navigation, hunts, creatorId = '', getData }: Props) => (
                 />
             ))}
         </View>
-    </View>
+    </MainView>
 );
 
 const BaseHome = dataFetcher(Home);

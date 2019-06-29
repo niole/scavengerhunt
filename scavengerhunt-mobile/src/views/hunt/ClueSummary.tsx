@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, View } from 'react-native';
+import { Text, View } from 'react-native-ui-lib';
 import { LatLng } from '../../domain/LatLng';
 import { ClueUpdate } from '../../domain/Clue';
 import withToggle from '../../containers/withToggle';
@@ -17,7 +17,7 @@ const handleUpdateClue = (
     });
 };
 
-const EditClueModal = withToggle<{ defaultLocation: LatLng; defaultText: string; onConfirm: ClueModalProps['onConfirm'] }>(props =>
+const EditClueModal = withToggle<{ buttonProps?: any; defaultLocation: LatLng; defaultText: string; onConfirm: ClueModalProps['onConfirm'] }>(props =>
     <CreateEditClueModal
         {...props}
         editing={true}
@@ -40,24 +40,28 @@ const ClueSummary = ({
         handleClueUpdate,
     }: Props) => {
     return (
-        <Card>
+        <Card
+            title={name}
+            footer={
+                <EditClueModal
+                    buttonProps={{ fullWidth: true }}
+                    defaultLocation={location}
+                    onConfirm={handleUpdateClue(handleClueUpdate, clueId)}
+                    defaultText={text}
+                />
+            }
+        >
             <View>
                 <View>
-                    <Text>{name}</Text>
-                    <EditClueModal
-                        defaultLocation={location}
-                        onConfirm={handleUpdateClue(handleClueUpdate, clueId)}
-                        defaultText={text}
-                    />
-                </View>
-                <Text>
                     <Text>
                         location {JSON.stringify(location)}
                     </Text>
+                </View>
+                <View>
                     <Text>
                         {text}
                     </Text>
-                </Text>
+                </View>
             </View>
         </Card>
     );

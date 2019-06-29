@@ -1,4 +1,5 @@
 import React from 'react';
+import { View, Text } from 'react-native-ui-lib';
 import { RouteComponentProps } from 'react-router';
 import HuntService from '../../services/HuntService';
 import TeamService from '../../services/TeamService';
@@ -25,12 +26,12 @@ type Props = {
 };
 
 const SuccessView = ({ huntName, teamName }: Props) => (
-    <div>
-        <h1>Congratulations {teamName}!</h1>
-        <div>
+    <View>
+        <Text h1>Congratulations {teamName}!</Text>
+        <Text>
             You solved {huntName}!
-        </div>
-    </div>
+        </Text>
+    </View>
 );
 
 export default withDataGetter<OuterProps, Props>(

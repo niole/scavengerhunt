@@ -1,6 +1,9 @@
 import React from 'react';
-import { Text, View } from 'react-native';
+import { View, Text } from 'react-native-ui-lib';
 import { NavigationScreenProp } from 'react-navigation';
+import ActionBar from '../../components/ActionBar';
+import Card from '../../components/Card';
+import MainView from '../../components/MainView';
 import Button from '../../components/Button';
 import withToggle from '../../containers/withToggle';
 import withDataGetter from '../../containers/withDataGetter';
@@ -16,7 +19,7 @@ const emailTeams = (huntId: string) => () => {
 };
 
 const EditTeamModal = withToggle<NonToggleProps>(CreateNewTeamModal)(
-        ({ onClick, children }) => <Button onClick={onClick}>{children}</Button>,
+    ({ onClick, children }) => <Button onClick={onClick} fullWidth={true}>{children}</Button>,
     { children: 'edit' }
 );
 
@@ -61,33 +64,31 @@ const handleCreateTeam = (huntId: string, dataGetter: () => void) => (name: stri
 };
 
 const InviteView = ({ hunt = {} as Hunt, teams, getData }: Props) => (
-    <View>
-        <Text>Invite Teams for Hunt</Text>
-        <Text>{hunt.name}</Text>
-        <CreateTeamModal
-            editing={false}
-            onConfirm={handleCreateTeam(hunt.id || '', getData)}
-        />
-        <Button onClick={emailTeams(hunt.id || '')} disabled={teams.length === 0}>
-            Email Teams
-        </Button>
+    <MainView>
+        <ActionBar>
+            {props => <CreateTeamModal
+                buttonProps={props}
+                editing={false}
+                onConfirm={handleCreateTeam(hunt.id || '', getData)}
+            />}
+            {props => <Button onClick={emailTeams(hunt.id || '')} disabled={teams.length === 0} {...props}>
+                Email Teams
+            </Button>}
+        </ActionBar>
+        <Text h2>{`Invite teams to play ${hunt.name}`}</Text>
         <View>
-            {!teams.length && (
-                <Text>Add a team</Text>
-            )}
             {teams.map((team: Team) => (
-                <View key={team.id}>
-                    <Text>team {team.name} </Text>
+                <Card title={team.name} key={team.id}>
                     <EditTeamModal
                         teamId={team.id}
                         editing={true}
                         onConfirm={handleUpdateTeamName(team.id, getData)}
                         defaultName={team.name}
                     />
-                </View>
+                </Card>
             ))}
         </View>
-    </View>
+    </MainView>
 );
 
 export default withDataGetter<OuterProps, InnerProps>(

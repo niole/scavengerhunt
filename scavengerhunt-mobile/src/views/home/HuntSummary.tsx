@@ -10,9 +10,9 @@ type Props = {
 };
 
 const HuntSummary = ({ onClick, name, huntId, creatorId }: Props) => (
-    <Card onPress={() => onClick(huntId, creatorId)} title="hunt">
+    <Card onPress={() => onClick(huntId, creatorId)} title={name}>
         <Text>
-            {name}
+            click to view
         </Text>
     </Card>
 );

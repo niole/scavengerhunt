@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text } from "react-native";
+import { View } from "react-native";
 import Dialog from './Dialog';
 import ValidatedForm, { ValidatedInput } from './ValidatedForm';
 
@@ -26,21 +26,21 @@ function CreateEditModal<Values, Defaults>({
         ...dialogProps
 }: Props<Values>): JSX.Element {
     return (
-        <Dialog open={visible} onClose={onClose} {...dialogProps}>
-            <Text>
-                {editing ? editingTitle : creatingTitle}
-            </Text>
-            <View>
-                <ValidatedForm
-                    inputs={inputs}
-                    onSubmit={async (values: Values) => {
-                        onConfirm(values);
-                        onClose();
-                    }}
-                    onCancel={onClose}
-                    defaultValues={defaultValues}
-                />
-            </View>
+        <Dialog
+            open={visible}
+            onClose={onClose}
+            {...dialogProps}
+            title={editing ? editingTitle : creatingTitle}
+        >
+            <ValidatedForm
+                inputs={inputs}
+                onSubmit={async (values: Values) => {
+                    onConfirm(values);
+                    onClose();
+                }}
+                onCancel={onClose}
+                defaultValues={defaultValues}
+            />
         </Dialog>
     );
 }

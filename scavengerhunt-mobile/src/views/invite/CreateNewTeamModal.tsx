@@ -26,6 +26,7 @@ export type Props = {
 } & NonToggleProps;
 
 export type NonToggleProps = {
+    buttonProps?: any;
     teamId?: string;
     editing: boolean;
     defaultName?: string;
