@@ -133,7 +133,7 @@ class ValidatedForm<V extends { [key: string]: any }> extends React.PureComponen
                 <ActionsContainer>
                     <View>
                         <Error message={submitError} />
-                        <ActionBar totalActions={2}>
+                        <ActionBar>
                             {props => <Button onClick={onCancel} {...props} key="cancel">
                                 Cancel
                             </Button>}

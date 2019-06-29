@@ -106,7 +106,7 @@ const inviteTeams = (navigation: NavigationProps['navigation'], huntId: string, 
 
 const HuntView = ({ navigation, hunt = {} as Hunt, clues, creatorId, getData }: Props) => (
     <View>
-        <ActionBar totalActions={4}>
+        <ActionBar>
             {() => (
                 <CreateClueModal
                     buttonProps={{ style: { height: 40 }, fullWidth: true }}
