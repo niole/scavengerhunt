@@ -7,17 +7,6 @@ import { TeamMember, NewTeamMember } from '../../domain/TeamMember';
 import { PluggableProps } from '../../components/ValidatedForm';
 import CreateEditModal from '../../components/CreateEditModal';
 
-type ChipProps = {
-    label: string;
-    onDelete: () => void;
-};
-
-const Chip = ({ label, onDelete }: ChipProps) => (
-    <Button onClick={onDelete}>
-        {label}
-    </Button>
-);
-
 export type Props = {
     teamMembers?: TeamMember[];
     visible: boolean;
@@ -54,11 +43,9 @@ const CreateEditTeamModal = ({ defaultName, onConfirm, ...props  }: Props) => {
     React.useEffect(() => {
         if (props.visible && props.teamId) {
             const members = TeamService.getTeamMembers(props.teamId);
-            console.log('rece', members);
             setTeamMembers(members);
         }
     }, [props.teamId, props.visible]);
-    console.log(teamMembers)
     return (
         <CreateEditModal
             editingTitle="Edit Team"
