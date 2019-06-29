@@ -54,6 +54,12 @@ class ValidatedForm<V extends { [key: string]: any }> extends React.PureComponen
         };
     }
 
+    componentDidUpdate(prevProps: Props<V>) {
+        if (prevProps.defaultValues !== this.props.defaultValues) {
+            this.setState({ values: this.props.defaultValues });
+        }
+    }
+
     onSubmit = () => {
         const { onSubmit } = this.props;
         const { values } = this.state;

@@ -1,12 +1,11 @@
 import React from 'react';
-import { View } from 'react-native';
+import { View, TagsInput } from 'react-native-ui-lib';
 import Button from '../../components/Button';
 import TextField from '../../components/TextField';
 import TeamService from '../../services/TeamService';
 import { TeamMember, NewTeamMember } from '../../domain/TeamMember';
 import { PluggableProps } from '../../components/ValidatedForm';
 import CreateEditModal from '../../components/CreateEditModal';
-import CreateNewMemberInput from './CreateTeamMemberInput';
 
 type ChipProps = {
     label: string;
@@ -55,9 +54,11 @@ const CreateEditTeamModal = ({ defaultName, onConfirm, ...props  }: Props) => {
     React.useEffect(() => {
         if (props.visible && props.teamId) {
             const members = TeamService.getTeamMembers(props.teamId);
+            console.log('rece', members);
             setTeamMembers(members);
         }
     }, [props.teamId, props.visible]);
+    console.log(teamMembers)
     return (
         <CreateEditModal
             editingTitle="Edit Team"
@@ -83,24 +84,17 @@ const CreateEditTeamModal = ({ defaultName, onConfirm, ...props  }: Props) => {
                     key: 'teamMembers',
                     Input: ({ value, onChange, error }: PluggableProps<any, NewTeamMember[]>) => (
                         <View>
-                            <View>
-                                <CreateNewMemberInput
-                                    onChange={(name: string, email: string) => {
-                                        onChange([...value, { name, email }]);
-                                    }}
-                                />
-                            </View>
-                            <View>
-                                {value.map((member: NewTeamMember) => (
-                                    <Chip
-                                        key={member.name}
-                                        label={member.email}
-                                        onDelete={() => {
-                                            onChange(value.filter((teamMember: NewTeamMember) => member.email !== teamMember.email));
-                                        }}
-                                    />
-                                ))}
-                            </View>
+                            <TagsInput
+                                tags={value.map((tm: { name: string; email: string }) => tm.email)}
+                                onCreateTag={(email: string) => {
+                                    onChange([...value, { name: email, email }]);
+                                }}
+                                onTagPress={(email: string) => {
+                                    onChange(
+                                        value.filter((teamMember: NewTeamMember) => email !== teamMember.email)
+                                    );
+                                }}
+                            />
                         </View>
                     )
                 }
