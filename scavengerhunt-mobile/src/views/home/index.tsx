@@ -93,6 +93,11 @@ const handleNavigate = (navigation: NavigationProps['navigation']) => (huntId: s
     navigation.navigate('hunt', { huntId, creatorId });
 };
 
+const removeHunt = (huntId: string, getData: () => void) => () => {
+    HuntService.deleteHunt(huntId);
+    getData();
+};
+
 const Home = ({ navigation, hunts, creatorId = '', getData }: Props) => (
     <MainView>
         <Modal onConfirm={handleHuntCreate(creatorId, getData)} buttonProps={{ fullWidth: true }}/>
@@ -104,6 +109,7 @@ const Home = ({ navigation, hunts, creatorId = '', getData }: Props) => (
                     creatorId={creatorId}
                     huntId={hunt.id}
                     name={hunt.name}
+                    removeHunt={removeHunt(hunt.id, getData)}
                 />
             ))}
         </View>

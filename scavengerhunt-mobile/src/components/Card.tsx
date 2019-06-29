@@ -4,7 +4,7 @@ import { View, Text, Card } from 'react-native-ui-lib';
 type Props = {
     title?: string;
     footer?: JSX.Element;
-    children: JSX.Element | string;
+    children?: JSX.Element | string;
     onPress?: () => void;
 };
 
