@@ -66,7 +66,7 @@ const CreateEditClueModal = ({ defaultText, defaultLocation, defaultNumber, onCo
                         error={error ? true : undefined}
                         label="Clue Number"
                         margin="normal"
-                        value={value.toString()}
+                        value={value ? value.toString() : value}
                         onChange={(event: any) => onChange(event.nativeEvent.text)}
                     />
                 )

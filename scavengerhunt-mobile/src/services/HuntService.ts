@@ -26,7 +26,26 @@ let hunts: Hunt[] = [{
     inProgress: true,
     ended: false,
     createdAt: new Date(),
-}];
+  },
+  {
+      startLocation: [0, 0],
+      name: 'MORE',
+      creatorId: 'x',
+      id: 'huntiidy',
+      inProgress: true,
+      ended: false,
+      createdAt: new Date(),
+  },
+  {
+      startLocation: [0, 0],
+      name: 'MORE HUNT NAMES',
+      creatorId: 'x',
+      id: 'tiidy',
+      inProgress: true,
+      ended: false,
+      createdAt: new Date(),
+  },
+];
 
 const DefaultHuntService: HuntService = {
   getAllHunts: (creatorId: string) => {

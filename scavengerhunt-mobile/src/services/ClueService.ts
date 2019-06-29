@@ -22,6 +22,15 @@ let clues: Clue[] = [
     location: [0, 0],
     number: 1,
   },
+  {
+    text: 'This is another  clue.',
+    id: 'cluid29',
+    creatorId: 'x',
+    huntId: 'huntidy',
+    assetUri: undefined,
+    location: [0, 0],
+    number: 13,
+  },
 ];
 // TODO delete
 let inProgressClues: InProgressClue[] = [];

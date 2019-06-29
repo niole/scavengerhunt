@@ -129,7 +129,7 @@ const HuntView = ({ navigation, hunt = {} as Hunt, clues, creatorId, getData }: 
         </ActionBar>
         <MainView title={hunt.name}>
             {!clues.length && (
-                <Text h1>
+                <Text>
                     Add some clues
                 </Text>
             )}
