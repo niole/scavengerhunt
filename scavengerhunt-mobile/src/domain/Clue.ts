@@ -11,6 +11,7 @@ export type Clue = {
 };
 
 export type ClueUpdate = {
+    number?: number;
     text?: string;
     assetUri?: string;
     clueId: string;

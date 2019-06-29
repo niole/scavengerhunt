@@ -12,6 +12,7 @@ export type Props = {
     onClose: () => void;
     defaultText?: string;
     defaultLocation?: LatLng;
+    defaultNumber?: number;
 };
 
 const handleConfirm = (onConfirm: Props['onConfirm']) => (values: { clueText?: string; location?: LatLng; clueNumber?: number }) => {
@@ -22,12 +23,12 @@ const handleConfirm = (onConfirm: Props['onConfirm']) => (values: { clueText?: s
     }
 };
 
-const CreateEditClueModal = ({ defaultText, defaultLocation, onConfirm, ...props  }: Props) => (
+const CreateEditClueModal = ({ defaultText, defaultLocation, defaultNumber, onConfirm, ...props  }: Props) => (
     <CreateEditModal
         editingTitle="Edit Clue"
         creatingTitle="Create A Clue"
         onConfirm={handleConfirm(onConfirm)}
-        defaultValues={{ clueText: defaultText, location: defaultLocation  }}
+        defaultValues={{ clueText: defaultText, location: defaultLocation, clueNumber: defaultNumber }}
         maxWidth="md"
         {...props}
         inputs={[[
@@ -65,7 +66,7 @@ const CreateEditClueModal = ({ defaultText, defaultLocation, onConfirm, ...props
                         error={error ? true : undefined}
                         label="Clue Number"
                         margin="normal"
-                        value={value}
+                        value={value.toString()}
                         onChange={(event: any) => onChange(event.nativeEvent.text)}
                     />
                 )

@@ -105,6 +105,11 @@ const inviteTeams = (navigation: NavigationProps['navigation'], huntId: string, 
     navigation.navigate('invite', { huntId, creatorId });
 };
 
+const deleteClue = (clueId: string, getData: () => void) => () => {
+    ClueService.deleteClue(clueId);
+    getData();
+};
+
 const HuntView = ({ navigation, hunt = {} as Hunt, clues, creatorId, getData }: Props) => (
     <View>
         <ActionBar>
@@ -130,9 +135,10 @@ const HuntView = ({ navigation, hunt = {} as Hunt, clues, creatorId, getData }: 
             )}
             {clues.map((clue: Clue, index: number) => (
                 <ClueSummary
+                    handleDelete={deleteClue(clue.id, getData)}
                     location={clue.location}
                     key={clue.id}
-                    name={`#${index + 1}`}
+                    clueNumber={clue.number}
                     text={clue.text}
                     clueId={clue.id}
                     handleClueUpdate={handleUpdateClue(getData)}
