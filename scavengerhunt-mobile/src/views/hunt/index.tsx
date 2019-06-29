@@ -110,42 +110,44 @@ const deleteClue = (clueId: string, getData: () => void) => () => {
     getData();
 };
 
-const HuntView = ({ navigation, hunt = {} as Hunt, clues, creatorId, getData }: Props) => (
-    <View>
-        <ActionBar>
-            {() => (
-                <CreateClueModal
-                    buttonProps={{ style: { height: 40 }, fullWidth: true }}
-                    onConfirm={handleCreateClue(hunt.id || '', creatorId || '', getData)}
-                />
-            )}
-            {props => <Button onClick={inviteTeams(navigation, hunt.id, creatorId)} {...props}>
-                Invite
-            </Button>}
-            {props => <Button {...getHuntLifeCycleButtonProps(getData, hunt)} {...props} />}
-            {props => <Button disabled={!hunt.inProgress} onClick={handleEndHunt(hunt.id || '', getData)} {...props}>
-                End
-            </Button>}
-        </ActionBar>
-        <MainView title={hunt.name}>
-            {!clues.length && (
-                <Text>
-                    Add some clues
-                </Text>
-            )}
-            {clues.map((clue: Clue, index: number) => (
-                <ClueSummary
-                    handleDelete={deleteClue(clue.id, getData)}
-                    location={clue.location}
-                    key={clue.id}
-                    clueNumber={clue.number}
-                    text={clue.text}
-                    clueId={clue.id}
-                    handleClueUpdate={handleUpdateClue(getData)}
-                />
-            ))}
-        </MainView>
-    </View>
-);
+const HuntView = ({ navigation, hunt = {} as Hunt, clues, creatorId, getData }: Props) => {
+    return (
+        <View>
+            <ActionBar>
+                {() => (
+                    <CreateClueModal
+                        buttonProps={{ style: { height: 40 }, fullWidth: true }}
+                        onConfirm={handleCreateClue(hunt.id || '', creatorId || '', getData)}
+                    />
+                )}
+                {props => <Button onClick={inviteTeams(navigation, hunt.id, creatorId)} {...props}>
+                    Invite
+                </Button>}
+                {props => <Button {...getHuntLifeCycleButtonProps(getData, hunt)} {...props} />}
+                {props => <Button disabled={!hunt.inProgress} onClick={handleEndHunt(hunt.id || '', getData)} {...props}>
+                    End
+                </Button>}
+            </ActionBar>
+            <MainView title={hunt.name}>
+                {!clues.length && (
+                    <Text>
+                        Add some clues
+                    </Text>
+                )}
+                {clues.map((clue: Clue, index: number) => (
+                    <ClueSummary
+                        handleDelete={deleteClue(clue.id, getData)}
+                        location={clue.location}
+                        key={clue.id}
+                        clueNumber={clue.number}
+                        text={clue.text}
+                        clueId={clue.id}
+                        handleClueUpdate={handleUpdateClue(getData)}
+                    />
+                    ))}
+            </MainView>
+        </View>
+    );
+};
 
 export default dataFetcher(HuntView);
