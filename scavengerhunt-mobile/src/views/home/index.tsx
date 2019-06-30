@@ -1,11 +1,15 @@
 import * as React from "react";
+import { Platform } from 'react-native';
 import { NavigationScreenProp } from 'react-navigation';
 import { View } from "react-native-ui-lib";
+import { Google } from 'expo';
 import { LatLng } from '../../domain/LatLng';
+import { Creator } from '../../domain/Creator';
 import { Hunt } from '../../domain/Hunt';
+import CreatorService from '../../services/CreatorService';
 import HuntService from '../../services/HuntService';
-
 import withDataGetter from '../../containers/withDataGetter';
+import Button from '../../components/Button';
 import MainView from '../../components/MainView';
 import Dialog from '../../components/Dialog';
 import TextField from '../../components/TextField';
@@ -118,7 +122,41 @@ const Home = ({ navigation, hunts, creatorId = '', getData }: Props) => (
 
 const BaseHome = dataFetcher(Home);
 
-const WithIdMocked = (props: NavigationProps) => <BaseHome creatorId="x" {...props} />;
+const signIn = (setCreator: (creator: Creator) => void) => async () => {
+    try {
+        const result = await Google.logInAsync({
+            clientId: Platform.OS === 'android' ? process.env.ANDROID_AUTH_CLIENT_ID : process.env.IOS_AUTH_CLIENT_ID,
+            scopes: ['profile', 'email'],
+        });
+        if (result.type === 'success') {
+	    const { user } = result;
+	    console.log('success', result);
+            const foundCreator = CreatorService.getCreator(user.email);
+            if (foundCreator) {
+                setCreator(foundCreator);
+            } else if (user) {
+                const creator = CreatorService.createCreator(user.email, user.name);
+                setCreator(creator);
+            }
+        } else {
+	    alert('Woops, couldn\'t sign you in');
+	}
+    } catch (e) {
+      console.log("error", e)
+    }
+};
 
-export default WithIdMocked;
+export default (props: NavigationProps) => {
+    const [creator, setCreator] = React.useState(undefined);
+    if (!creator) {
+        return (
+            <Button onClick={signIn(setCreator)}>
+                Sign In
+            </Button>
+        );
+    }
+    return (
+        <BaseHome creatorId={creator.id} {...props} />
+    );
+};
 

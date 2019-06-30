@@ -28,10 +28,16 @@
       "permissions": [
         "android.permission.ACCESS_FINE_LOCATION",
       ],
+      "googleServicesFile": "./google-services.json"
     },
     "ios": {
       "bundleIdentifier": "com.niole.scavengerhunt",
       "supportsTablet": true,
+      "config": {
+        "googleSignIn": {
+          "reservedClientId": "HERE"
+        },
+      },
       "infoPlist": {
         "NSLocationWhenInUseUsageDescription": "location for maps"
       },

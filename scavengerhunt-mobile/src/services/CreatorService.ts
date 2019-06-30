@@ -5,7 +5,7 @@ let creators: Creator[] =  [];
 type CreatorService = {
   createCreator: (email: string, name: string) => Creator;
 
-  getCreator: (creatorId: string) => Creator | undefined;
+  getCreator: (email: string) => Creator | undefined;
 };
 
 const DefaultCreatorService: CreatorService = {
@@ -21,7 +21,7 @@ const DefaultCreatorService: CreatorService = {
     return newCreator;
   },
 
-  getCreator: (creatorId: string) => creators.find(({ id }) => id === creatorId),
+  getCreator: (email: string) => creators.find(creator => creator.email === email),
 };
 
 export default DefaultCreatorService;
