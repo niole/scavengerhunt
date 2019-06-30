@@ -1,6 +1,5 @@
 import React from 'react';
-import { TagsInput } from 'react-native-ui-lib';
-import Button from '../../components/Button';
+import { Colors, Text, TagsInput } from 'react-native-ui-lib';
 import TextField from '../../components/TextField';
 import TeamService from '../../services/TeamService';
 import { TeamMember, NewTeamMember } from '../../domain/TeamMember';
@@ -71,6 +70,8 @@ const CreateEditTeamModal = ({ defaultName, onConfirm, ...props  }: Props) => {
                     key: 'teamMembers',
                     Input: ({ value, onChange, error }: PluggableProps<any, NewTeamMember[]>) => (
                         <TagsInput
+                            marginB-24
+                            placeholder="Add the emails of the people you want to invite"
                             tags={value.map((tm: { name: string; email: string }) => tm.email)}
                             onCreateTag={(email: string) => {
                                 onChange([...value, { name: email, email }]);
