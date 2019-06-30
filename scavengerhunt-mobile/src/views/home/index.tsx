@@ -130,7 +130,6 @@ const signIn = (setCreator: (creator: Creator) => void) => async () => {
         });
         if (result.type === 'success') {
 	    const { user } = result;
-	    console.log('success', result);
             const foundCreator = CreatorService.getCreator(user.email);
             if (foundCreator) {
                 setCreator(foundCreator);
