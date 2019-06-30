@@ -129,7 +129,7 @@ const signIn = (setCreator: (creator: Creator) => void) => async () => {
             scopes: ['profile', 'email'],
         });
         if (result.type === 'success') {
-	    const { user } = result;
+            const { user } = result;
             const foundCreator = CreatorService.getCreator(user.email);
             if (foundCreator) {
                 setCreator(foundCreator);
@@ -138,10 +138,10 @@ const signIn = (setCreator: (creator: Creator) => void) => async () => {
                 setCreator(creator);
             }
         } else {
-	    alert('Woops, couldn\'t sign you in');
-	}
+            alert('Woops, couldn\'t sign you in');
+        }
     } catch (e) {
-      console.log("error", e)
+        console.log("error", e)
     }
 };
 
@@ -156,6 +156,6 @@ export default (props: NavigationProps) => {
     }
     return (
         <BaseHome creatorId={creator.id} {...props} />
-    );
+        );
 };
 
