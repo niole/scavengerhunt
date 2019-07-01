@@ -10,12 +10,19 @@ import withDataGetter from '../../containers/withDataGetter';
 import { Hunt } from '../../domain/Hunt';
 import { Team } from '../../domain/Team';
 import { NewTeamMember } from '../../domain/TeamMember';
+import EmailTeamsService from '../../services/EmailTeamsService';
 import HuntService from '../../services/HuntService';
 import TeamService from '../../services/TeamService';
 import CreateNewTeamModal, { NonToggleProps } from './CreateNewTeamModal';
 
 const emailTeams = (huntId: string) => () => {
-    console.log('email teams for hunt ', huntId);
+    EmailTeamsService.emailTeams(huntId)
+    .then(() => {
+        console.log('emailed teams for hunt ', huntId);
+    })
+    .catch((error: any) => {
+        console.error('oh no ', error);
+    });
 };
 
 const EditTeamModal = withToggle<NonToggleProps>(CreateNewTeamModal)(
