@@ -9,6 +9,7 @@ import { Hunt } from '../../domain/Hunt';
 import CreatorService from '../../services/CreatorService';
 import HuntService from '../../services/HuntService';
 import withDataGetter from '../../containers/withDataGetter';
+import ActionBar from '../../components/ActionBar';
 import Button from '../../components/Button';
 import MainView from '../../components/MainView';
 import Dialog from '../../components/Dialog';
@@ -72,19 +73,19 @@ type NavigationProps = {
 
 type Props = {
     hunts: Hunt[];
-    creatorId: string | undefined;
+    creatorId: string;
+    creatorName: string;
     getData: () => void;
 } & NavigationProps;
 
 type OuterProps = {
-    creatorId: string | undefined;
+    creatorId: string;
+    creatorName: string;
 } & NavigationProps;
 
-const dataFetcher = withDataGetter<OuterProps, { hunts: Hunt[]; creatorId: string | undefined }>(
-    async ({ creatorId, ...rest }) => creatorId ?
-        { hunts: HuntService.getAllHunts(creatorId), creatorId, ...rest } :
-        { hunts: [], creatorId: undefined,  ...rest },
-    () => ({ hunts: [], creatorId: undefined }),
+const dataFetcher = withDataGetter<OuterProps, { hunts: Hunt[]; creatorId: string; creatorName: string }>(
+    async ({ creatorId, ...rest }) => ({ hunts: HuntService.getAllHunts(creatorId), creatorId, ...rest }),
+    undefined,
     (props: OuterProps) => props.creatorId,
 );
 
@@ -102,9 +103,14 @@ const removeHunt = (huntId: string, getData: () => void) => () => {
     getData();
 };
 
-const Home = ({ navigation, hunts, creatorId = '', getData }: Props) => (
-    <MainView>
-        <Modal onConfirm={handleHuntCreate(creatorId, getData)} buttonProps={{ fullWidth: true }}/>
+const Home = ({ navigation, creatorName, hunts, creatorId, getData }: Props) => (
+    <MainView title={`Welcome ${creatorName}`}>
+        <ActionBar>
+            {props => <Modal onConfirm={handleHuntCreate(creatorId, getData)} buttonProps={props}/>}
+            {props => <Button {...props} onClick={() => navigation.navigate('invitations', { creatorId })}>
+                View Invitations
+            </Button>}
+        </ActionBar>
         <View paddingT-24>
             {hunts.map((hunt: Hunt) => (
                 <HuntSummary
@@ -155,7 +161,7 @@ export default (props: NavigationProps) => {
         );
     }
     return (
-        <BaseHome creatorId={creator.id} {...props} />
-        );
+        <BaseHome creatorId={creator.id} creatorName={creator.name} {...props} />
+    );
 };
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View } from 'react-native';
+import { Text, View } from 'react-native';
 import { ChildComponent } from './util';
 
 type DefaultChildProps = {
@@ -35,7 +35,9 @@ export default function withDataGetter<FetchArguments, Result extends {}>(
             />
         ) : (
             <View>
-                Loading...
+                <Text>
+                    Loading...
+                </Text>
             </View>
         );
     };

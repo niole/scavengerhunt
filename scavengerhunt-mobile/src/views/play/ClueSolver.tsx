@@ -1,5 +1,7 @@
 import React from 'react';
+import { Text } from 'react-native-ui-lib';
 import Button from '../../components/Button';
+import Card from '../../components/Card';
 import { Clue } from '../../domain/Clue';
 import ClueService from '../../services/ClueService';
 import HuntLocationService from '../../services/HuntLocationService';
@@ -82,27 +84,27 @@ const ClueSolver = ({
     }, [teamId]);
     if (!!inProgressClue) {
         return (
-            <div>
-                <div>
-                    clue #{inProgressClue.number}
-                </div>
-                <div>
-                    {inProgressClue.text}
-                </div>
-                <div>
+            <Card
+                title={`clue #${inProgressClue.number}`}
+                footer={
                     <Button onClick={solveCurrentClue(setInProgressClue, handleHuntSuccess, inProgressClue, teamId, huntId)}>
                         Solve
                     </Button>
-                </div>
-            </div>
+                }
+            >
+                <Text>
+                    {inProgressClue.text}
+                </Text>
+            </Card>
         );
     }
     return (
         <Button
             disabled={!huntInProgress || huntEnded}
             onClick={startHunting(setInProgressClue, teamId, huntId)}
+            fullWidth={true}
         >
-            Start {huntName}
+            {`Start ${huntName}`}
         </Button>
     );
 };

@@ -1,4 +1,5 @@
 import email from 'react-native-email'
+import { Linking } from 'expo';
 import { TeamMember } from '../domain/TeamMember';
 import { Team } from '../domain/Team';
 import HuntService from './HuntService';
@@ -22,7 +23,7 @@ const DefaultEmailTeamsService: EmailTeamsService = {
           subject: `${creator.name} is inviting you to a Scavenger Hunt!`,
           body: `
             You've been invited to play ${creator.name}'s Scavenger Hunt: ${hunt.name}.
-            Click the link to join your team, ${team.name}.
+            Click the link to join your team, ${team.name}: <a="${Linking.makeUrl()}">here</a>.
 
             Your team mates, ${teamMembers.map((member: TeamMember) => member.name).join(', ')} are waiting.
           `

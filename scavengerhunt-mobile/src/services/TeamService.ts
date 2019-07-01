@@ -39,6 +39,8 @@ type TeamService = {
   updateTeamPlace: (teamId: string, place: number) => void;
 
   getTeamMember: (memberId: string) => TeamMember | undefined;
+
+  getTeamMemberByEmail: (email: string) => TeamMember[];
 };
 
 const DefaultTeamService = {
@@ -123,6 +125,10 @@ const DefaultTeamService = {
 
   getTeamById: (teamId: string) => {
     return teams.find(({ id }: Team) => id === teamId);
+  },
+
+  getTeamMemberByEmail: (email: string) => {
+    return teamMembers.filter((member: TeamMember) => member.email === email);
   },
 
 };

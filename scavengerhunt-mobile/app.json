@@ -10,6 +10,7 @@
       "web"
     ],
     "version": "1.0.0",
+    "scheme": "scavengerhunt",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "splash": {
@@ -27,8 +28,7 @@
       "package": "com.niole.scavengerhunt",
       "permissions": [
         "android.permission.ACCESS_FINE_LOCATION",
-      ],
-      "googleServicesFile": "./google-services.json"
+      ]
     },
     "ios": {
       "bundleIdentifier": "com.niole.scavengerhunt",

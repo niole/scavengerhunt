@@ -5,11 +5,12 @@ import { LatLng } from '../../domain/LatLng';
 import withDataGetter from '../../containers/withDataGetter';
 import HuntService from '../../services/HuntService';
 import TeamService from '../../services/TeamService';
+import MainView from '../../components/MainView';
 import ClueSolver from './ClueSolver';
 
-const handleHuntSuccess = (navigate: NavigationProps['navigate'], huntId: string, teamId: string) => () => {
+const handleHuntSuccess = (navigation: NavigationProps['navigation'], huntId: string, teamId: string) => () => {
     TeamService.setTeamSuccess(teamId);
-    navigate('success', { huntId, teamId });
+    navigation.navigate('success', { huntId, teamId });
 };
 
 type TeamDetails = undefined | {
@@ -58,7 +59,9 @@ const getHuntDetails = (huntId: string): HuntDetails => {
     }
 };
 
-type NavigationProps = NavigationScreenProp<{}, { huntId: string; memberId: string }>
+type NavigationProps = {
+    navigation: NavigationScreenProp<{}, { huntId: string; memberId: string }>;
+};
 
 type OuterProps = NavigationProps;
 
@@ -86,15 +89,13 @@ const PlayView = ({
         huntId,
         teamId,
         memberId,
-        navigate,
+        navigation,
     }: Props) => (
-    <View>
-        <Text>Play</Text>
-        <Text>Welcome {memberName} of {teamName} to {huntName}!</Text>
+    <MainView title={`Welcome ${memberName} of ${teamName} to ${huntName}!`}>
         <View>
             {!!huntId && !!huntName && !!teamId && !!memberId && (
                 <ClueSolver
-                    handleHuntSuccess={handleHuntSuccess(navigate, huntId, teamId)}
+                    handleHuntSuccess={handleHuntSuccess(navigation, huntId, teamId)}
                     huntName={huntName}
                     huntInProgress={inProgress}
                     huntEnded={ended}
@@ -113,7 +114,7 @@ const PlayView = ({
                 {!inProgress && 'This hunt isn\'t running at the moment.'}
             </Text>
         </View>
-    </View>
+    </MainView>
 );
 
 const defaultValues = {
@@ -123,10 +124,10 @@ const defaultValues = {
 export default withDataGetter<OuterProps, Props>(
     async (props: OuterProps) => ({
         ...defaultValues,
-        ...(getHuntDetails(props.getParam('huntId')) || {}),
-        ...(getTeamDetails(props.getParam('memberId')) || {}),
+        ...(getHuntDetails(props.navigation.getParam('huntId')) || {}),
+        ...(getTeamDetails(props.navigation.getParam('memberId')) || {}),
         ...props
     }),
-    (props: OuterProps) => ({ ...defaultValues, ...props }),
-    (props: OuterProps) => props.getParam('huntId'),
+    undefined,
+    (props: OuterProps) => props.navigation.getParam('huntId'),
 )(PlayView);
