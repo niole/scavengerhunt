@@ -1,31 +1,50 @@
 import { Creator } from '../domain/Creator';
-
-let creators: Creator[] =  [];
+import * as firebase from 'firebase';
 
 type CreatorService = {
-  createCreator: (email: string, name: string) => Creator;
+  createCreator: (email: string, name: string, authId: string) => Promise<Creator>;
 
-  getCreator: (email: string) => Creator | undefined;
+  getCreator: (email: string) => Promise<Creator | undefined>;
 
-  getCreatorById: (id: string) => Creator | undefined;
+  getCreatorById: (id: string) => Promise<Creator | undefined>;
 };
 
 const DefaultCreatorService: CreatorService = {
-  createCreator: (email: string, name: string) => {
+  createCreator: async (email: string, name: string, authId: string) => {
     const newCreator = {
       email,
       name,
-      id: `${Math.random()}`,
+      id: authId,
     };
 
-    creators.push(newCreator);
+    await firebase.database().ref(`creators/${authId}`).set(newCreator);
 
-    return newCreator;
+    return firebase.database()
+      .ref(`creators/${authId}`)
+      .once('value').then((dataSnapshot: firebase.database.DataSnapshot) => dataSnapshot.val());
   },
 
-  getCreator: (email: string) => creators.find(creator => creator.email === email),
+  getCreator: (email: string) => {
+    return firebase.database()
+      .ref('creators')
+      .orderByChild('email')
+      .equalTo(email)
+      .once('value')
+      .then((dataSnapshot: firebase.database.DataSnapshot) => {
+        return Object.values(dataSnapshot.val())[0] as Creator;
+      });
+  },
 
-  getCreatorById: (id: string) => creators.find(creator => creator.id === id),
+  getCreatorById: (id: string) => {
+    return firebase.database()
+    .ref('creators')
+    .orderByChild('id')
+    .equalTo(id)
+    .once('value')
+    .then((dataSnapshot: firebase.database.DataSnapshot) => {
+      return Object.values(dataSnapshot.val())[0] as Creator;
+    });
+  },
 };
 
 export default DefaultCreatorService;

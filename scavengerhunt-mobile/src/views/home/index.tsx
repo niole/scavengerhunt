@@ -136,11 +136,11 @@ const signIn = (setCreator: (creator: Creator) => void) => async () => {
         });
         if (result.type === 'success') {
             const { user } = result;
-            const foundCreator = CreatorService.getCreator(user.email);
+            const foundCreator = await CreatorService.getCreator(user.email);
             if (foundCreator) {
                 setCreator(foundCreator);
             } else if (user) {
-                const creator = CreatorService.createCreator(user.email, user.name);
+                const creator = await CreatorService.createCreator(user.email, user.name, user.id);
                 setCreator(creator);
             }
         } else {

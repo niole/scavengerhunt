@@ -38,8 +38,8 @@ const InvitationsView = (props: Props) => (
     </MainView>
 );
 
-const getInitialData = (creatorId: string) => {
-    const creator = CreatorService.getCreatorById(creatorId);
+const getInitialData = async (creatorId: string) => {
+    const creator = await CreatorService.getCreatorById(creatorId);
     const teamMembers = TeamService.getTeamMemberByEmail(creator.email);
     const teams = teamMembers.map((member: TeamMember) => TeamService.getTeamById(member.teamId));
     const hunts = teams.map((team: Team) => HuntService.getHunt(team.huntId));
@@ -51,7 +51,7 @@ const getInitialData = (creatorId: string) => {
 
 export default withDataGetter<OuterProps, Props>(
     async (props: OuterProps) => ({
-        ...getInitialData(props.navigation.getParam('creatorId')),
+        ...await getInitialData(props.navigation.getParam('creatorId')),
         navigation: props.navigation,
     }),
 )(InvitationsView);

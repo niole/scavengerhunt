@@ -1,6 +1,7 @@
 import * as React from "react";
 import './src/secrets/env';
 import './src/style/typography';
+import './src/services/DatabaseService';
 import { createStackNavigator, createAppContainer } from "react-navigation";
 import Home from './src/views/home';
 import Hunt from './src/views/hunt';

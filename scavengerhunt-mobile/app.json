@@ -28,7 +28,8 @@
       "package": "com.niole.scavengerhunt",
       "permissions": [
         "android.permission.ACCESS_FINE_LOCATION",
-      ]
+      ],
+      "googleServicesFile": "./android/app/google-services.json"
     },
     "ios": {
       "bundleIdentifier": "com.niole.scavengerhunt",

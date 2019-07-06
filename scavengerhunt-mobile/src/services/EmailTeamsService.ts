@@ -13,7 +13,7 @@ type EmailTeamsService = {
 const DefaultEmailTeamsService: EmailTeamsService = {
   emailTeams: async (huntId: string) => {
     const hunt = HuntService.getHunt(huntId);
-    const creator = CreatorService.getCreatorById(hunt.creatorId);
+    const creator = await CreatorService.getCreatorById(hunt.creatorId);
     const teams = TeamService.getTeams(huntId);
 
     return Promise.all(teams.map((team: Team) => {
