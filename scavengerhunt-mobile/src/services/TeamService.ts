@@ -2,7 +2,7 @@ import * as firebase from 'firebase';
 import uuid from 'uuid/v1';
 import { Team, TeamUpdate } from '../domain/Team';
 import { NewTeamMember, TeamMember } from '../domain/TeamMember';
-import { refUtil } from './DatabaseService';
+import { getMany, getOne, refUtil } from './DatabaseService';
 
 const TEAM_COLLECTION = 'teams';
 
@@ -16,6 +16,8 @@ type TeamService = {
   getTeams: (huntId: string) => Promise<Team[]>;
 
   getTeam: (name: string, huntId: string) => Promise<Team | undefined>;
+
+  removeTeamMembers: (teamId: string) => Promise<void>;
 
   getTeamById: (teamId: string) => Promise<Team | undefined>;
 
@@ -59,13 +61,18 @@ const DefaultTeamService = {
   },
 
   getTeams: (huntId: string) => {
-    return teamRef().orderByChild('huntId').equalTo(huntId).once('value')
-      .then((dataSnapshot: firebase.database.DataSnapshot) => Object.values(dataSnapshot.val()));
+    return getMany<Team>(teamRef().orderByChild('huntId').equalTo(huntId));
   },
 
   getTeam: (name: string, huntId: string) => {
-    return teamRef().orderByChild('huntId').equalTo(huntId).orderByChild('name').equalTo(name).once('value')
-    .then((dataSnapshot: firebase.database.DataSnapshot) => Object.values(dataSnapshot.val())[0]);
+    return getMany<Team>(teamRef().orderByChild('huntId').equalTo(huntId).orderByChild('name').equalTo(name))
+    .then(teams => teams[0]);
+  },
+
+  removeTeamMembers: (teamId: string) => {
+    return teamMemberRef().orderByChild('teamId').equalTo(teamId).once('value').then(
+        (snapshots: firebase.database.DataSnapshot) => snapshots.ref.remove()
+    )
   },
 
   updateTeam: (update: TeamUpdate) => {
@@ -86,10 +93,7 @@ const DefaultTeamService = {
   },
 
   getTeamMembers: (teamId: string) => {
-    return teamMemberRef().orderByChild('teamId').equalTo(teamId).once('value')
-    .then(
-      (dataSnapshot: firebase.database.DataSnapshot) => Object.values(dataSnapshot.val())
-    );
+    return getMany<TeamMember>(teamMemberRef().orderByChild('teamId').equalTo(teamId));
   },
 
   removeTeam: (teamId: string) => {
@@ -109,18 +113,17 @@ const DefaultTeamService = {
   },
 
   getTeamMember: (memberId: string) => {
-    return teamMemberRef(memberId).once('value')
-    .then((dataSnapshot: firebase.database.DataSnapshot) =>dataSnapshot.val());
+    return getOne<TeamMember>(teamMemberRef(memberId));
   },
 
   getTeamById: (teamId: string) => {
-    return teamRef(teamId).once('value')
-    .then((dataSnapshot: firebase.database.DataSnapshot) =>dataSnapshot.val());
+    return getOne<Team>(teamRef(teamId));
   },
 
   getTeamMemberByEmail: (email: string) => {
-    return teamMemberRef().orderByChild('email').equalTo(email).once('value')
-    .then((dataSnapshot: firebase.database.DataSnapshot) => Object.values(dataSnapshot.val())[0]);
+    return getMany<TeamMember>(teamMemberRef().orderByChild('email').equalTo(email)).then(
+      members => members[0]
+    );
   },
 
 };

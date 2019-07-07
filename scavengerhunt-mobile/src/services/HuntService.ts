@@ -3,6 +3,7 @@ import uuid from 'uuid/v1';
 import { LatLng } from '../domain/LatLng';
 import { Hunt } from '../domain/Hunt';
 import { refUtil, getMany, getOne } from './DatabaseService';
+import TeamService from './TeamService';
 
 const huntsRef = refUtil('hunts');
 
@@ -49,7 +50,15 @@ const DefaultHuntService: HuntService = {
   },
 
   deleteHunt: (huntId: string) => {
-    return huntsRef(huntId).remove();
+    return huntsRef(huntId).remove().then(() => {
+      // TODO throwing errors away here...
+      TeamService.getTeams(huntId).then(teams =>
+       teams.forEach(({ id }) =>
+        TeamService.removeTeam(id).then(() => {
+          return TeamService.removeTeamMembers(id);
+        })
+      ));
+    })
   },
 
   startHunt: (huntId: string) => {

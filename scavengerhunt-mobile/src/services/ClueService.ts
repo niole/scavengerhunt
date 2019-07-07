@@ -3,7 +3,7 @@ import uuid from 'uuid/v1';
 import { LatLng } from '../domain/LatLng';
 import { ClueUpdate, Clue } from '../domain/Clue';
 import { InProgressClue } from '../domain/InProgressClue';
-import { refUtil } from './DatabaseService';
+import { getOne, getMany, refUtil } from './DatabaseService';
 
 const clueRef = refUtil('clues');
 
@@ -56,12 +56,16 @@ const DefaultClueService: ClueService = {
       text,
       huntId,
       creatorId,
-      assetUri,
       id,
       location,
+      assetUri,
     };
 
-    return clueRef(id).set(newClue).then(x => x.val());
+    if (!assetUri) {
+      delete newClue.assetUri;
+    }
+
+    return clueRef(id).set(newClue).then(() => newClue);
   },
 
   deleteClue: (clueId: string) => {
@@ -87,10 +91,7 @@ const DefaultClueService: ClueService = {
   },
 
   getInProgressClue: (teamId: string) => {
-    return inProgressClueRef().orderByChild('teamId').equalTo(teamId).once('value')
-    .then(
-      (dataSnapshot: firebase.database.DataSnapshot) => dataSnapshot.val()
-    );
+    return getOne<InProgressClue>(inProgressClueRef().orderByChild('teamId').equalTo(teamId));
   },
 
   updateClue: ({ clueId, ...rest }: ClueUpdate) => {
@@ -98,27 +99,17 @@ const DefaultClueService: ClueService = {
   },
 
   getClues: (huntId: string) => {
-    return clueRef().orderByChild('huntId').equalTo(huntId).once('value')
-    .then(
-      (dataSnapshot: firebase.database.DataSnapshot) => dataSnapshot.val()
-    );
+    return getMany<Clue>(clueRef().orderByChild('huntId').equalTo(huntId));
   },
 
   getClue: (clueId: string) => {
-    return clueRef(clueId).once('value')
-    .then(
-      (dataSnapshot: firebase.database.DataSnapshot) => dataSnapshot.val()
-    );
+    return getOne<Clue>(clueRef(clueId));
   },
 
   getClueByNumber: (huntId: string, rank: number) => {
-    return clueRef()
+    return getOne<Clue>(clueRef()
     .orderByChild('huntId').equalTo(huntId)
-    .orderByChild('number').equalTo(rank)
-    .once('value')
-    .then(
-      (dataSnapshot: firebase.database.DataSnapshot) => dataSnapshot.val()
-    );
+    .orderByChild('number').equalTo(rank));
   },
 
   setInProgressClue: (clueId: string, teamId: string) => {

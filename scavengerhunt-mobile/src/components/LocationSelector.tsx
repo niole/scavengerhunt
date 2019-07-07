@@ -51,48 +51,51 @@ const LocationSelector = ({
         onLocationSelect,
         error,
     }: Props) => {
+        const [mapReady, setMapReady] = React.useState(false);
         const [styles, setStyles] = React.useState();
         const [location, setLocation] = React.useState(defaultLocation);
         const [defaultState, setDefaultState] = React.useState([0, 0] as LatLng);
         React.useEffect(() => {
-            if (!defaultLocation) {
+            if (mapReady) {
                 setTimeout(() => {
                     setStyles(defaultStyles.map); // this is a workaround for the user locator button
                     // not rendering on first render in android
                 }, 250);
-
-                navigator.geolocation.getCurrentPosition(
-                    ({ coords }) => {
-                        setDefaultState([coords.latitude, coords.longitude])
-                    },
-                    (error: any) => {
-                        console.log('ERROR', error);
-                    },
-                    {
-                        enableHighAccuracy: true,
-                        timeout: 1000,
-                        maximumAge: 10000,
-                    }
-                );
+                if (!defaultLocation) {
+                    navigator.geolocation.getCurrentPosition(
+                        ({ coords }) => {
+                            setDefaultState([coords.latitude, coords.longitude])
+                        },
+                        (error: any) => {
+                            console.log('ERROR', error);
+                        },
+                        {
+                            enableHighAccuracy: true,
+                            timeout: 1000,
+                            maximumAge: 10000,
+                        }
+                    );
+                }
             }
-        }, []);
+        }, [mapReady]);
     const renderedLocation = location || defaultState;
     return (
         <View>
             <MapView
-                region={{
+                region={mapReady ? {
                     latitude: renderedLocation[0],
                     longitude: renderedLocation[1],
                     latitudeDelta: 0.0922,
                     longitudeDelta: 0.0421,
-                }}
+                } : undefined}
                 style={styles}
                 showsMyLocationButton={true}
                 onPress={handlePress(onLocationSelect, setLocation)}
                 showsUserLocation={true}
                 zoomControlEnabled={true}
+                onMapReady={() => setMapReady(true)}
             >
-                {location ? <Marker coordinate={{ longitude: location[1], latitude: location[0] }} /> : null}
+                {mapReady && styles && location ? <Marker coordinate={{ longitude: location[1], latitude: location[0] }} /> : null}
             </MapView>
             <SelectedLocationContainer
                 error={error}

@@ -58,29 +58,49 @@ const handleCreateClue = (
         huntId: string,
         creatorId: string,
         getData: () => void
-    ) => (clueText: string, location: LatLng, clueNumber: number) => {
-    ClueService.createClue(location, clueText, huntId, creatorId, clueNumber);
-    getData();
+    ) => async (clueText: string, location: LatLng, clueNumber: number) => {
+    try {
+        await ClueService.createClue(location, clueText, huntId, creatorId, clueNumber);
+        getData();
+    } catch (error) {
+        console.log('ERROR', error);
+    }
 };
 
-const handleUpdateClue = (getData: () => void) => (clueUpdate: ClueUpdate) => {
-    ClueService.updateClue(clueUpdate);
-    getData();
+const handleUpdateClue = (getData: () => void) => async (clueUpdate: ClueUpdate) => {
+    try {
+        await ClueService.updateClue(clueUpdate);
+        getData();
+    } catch (error) {
+        console.log('ERROR', error);
+    }
 };
 
-const handleStartHunt = (huntId: string, dataGetter: () => void) => () => {
-    HuntService.startHunt(huntId);
-    dataGetter();
+const handleStartHunt = (huntId: string, dataGetter: () => void) => async () => {
+    try {
+        await HuntService.startHunt(huntId);
+        dataGetter();
+    } catch (error) {
+        console.log('ERROR', error);
+    }
 };
 
-const handleEndHunt = (huntId: string, dataGetter: () => void) => () => {
-    HuntService.endHunt(huntId);
-    dataGetter();
+const handleEndHunt = (huntId: string, dataGetter: () => void) => async () => {
+    try {
+        await HuntService.endHunt(huntId);
+        dataGetter();
+    } catch (error) {
+        console.log('ERROR', error);
+    }
 };
 
-const handleStopHunt = (huntId: string, dataGetter: () => void) => () => {
-    HuntService.stopHunt(huntId);
-    dataGetter();
+const handleStopHunt = (huntId: string, dataGetter: () => void) => async () => {
+    try {
+        await HuntService.stopHunt(huntId);
+        dataGetter();
+    } catch (error) {
+        console.log('ERROR', error);
+    }
 };
 
 const getHuntLifeCycleButtonProps = (dataGetter: () => void, hunt?: Hunt) => {
@@ -108,9 +128,13 @@ const inviteTeams = (navigation: NavigationProps['navigation'], huntId: string, 
     navigation.navigate('invite', { huntId, creatorId });
 };
 
-const deleteClue = (clueId: string, getData: () => void) => () => {
-    ClueService.deleteClue(clueId);
-    getData();
+const deleteClue = (clueId: string, getData: () => void) => async () => {
+    try {
+        await ClueService.deleteClue(clueId);
+        getData();
+    } catch (error) {
+        console.log('ERROR', error);
+    }
 };
 
 const HuntView = ({ navigation, hunt = {} as Hunt, clues, creatorId, getData }: Props) => {

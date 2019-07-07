@@ -41,8 +41,11 @@ const CreateEditTeamModal = ({ defaultName, onConfirm, ...props  }: Props) => {
     const [teamMembers, setTeamMembers] = React.useState([] as NewTeamMember[]);
     React.useEffect(() => {
         if (props.visible && props.teamId) {
-            const members = TeamService.getTeamMembers(props.teamId);
-            setTeamMembers(members);
+            TeamService.getTeamMembers(props.teamId).then((members: TeamMember[]) => {
+                setTeamMembers(members);
+            }).catch((error: any) => {
+                console.log('ERROR', error);
+            });
         }
     }, [props.teamId, props.visible]);
     return (
