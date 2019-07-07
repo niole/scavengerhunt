@@ -1,134 +1,126 @@
+import * as firebase from 'firebase';
+import uuid from 'uuid/v1';
 import { Team, TeamUpdate } from '../domain/Team';
 import { NewTeamMember, TeamMember } from '../domain/TeamMember';
+import { refUtil } from './DatabaseService';
 
-let teamMembers: TeamMember[] = [{
-    email: 'niolenelson@gmail.com',
-    name: 'niole',
-    id: 'nioleid',
-    teamId: 'nioleteamid',
-}];
-let teams: Team[] = [{
-    huntId: 'huntidy',
-    name: 'TeamNiole',
-    id: 'nioleteamid',
-    place: 0,
-    done: false,
-}];
+const TEAM_COLLECTION = 'teams';
+
+const TEAM_MEMBER_COLLECTION = 'teammembers';
 
 type TeamService = {
-  setTeamSuccess: (teamId: string) => void;
+  setTeamSuccess: (teamId: string) => Promise<void>;
 
-  createTeam: (name: string, huntId: string) => Team;
+  createTeam: (name: string, huntId: string) => Promise<Team>;
 
-  getTeams: (huntId: string) => Team[];
+  getTeams: (huntId: string) => Promise<Team[]>;
 
-  getTeam: (name: string, huntId: string) => Team | undefined;
+  getTeam: (name: string, huntId: string) => Promise<Team | undefined>;
 
-  getTeamById: (teamId: string) => Team | undefined;
+  getTeamById: (teamId: string) => Promise<Team | undefined>;
 
-  updateTeam: (update: TeamUpdate) => void;
+  updateTeam: (update: TeamUpdate) => Promise<void>;
 
-  removeTeam: (teamId: string) => void;
+  removeTeam: (teamId: string) => Promise<void>;
 
-  setTeamMembers: (teamId: string, teamMembers: NewTeamMember[]) => void;
+  setTeamMembers: (teamId: string, teamMembers: NewTeamMember[]) => Promise<void>;
 
-  getTeamMembers: (teamId: string) => TeamMember[];
+  getTeamMembers: (teamId: string) => Promise<TeamMember[]>;
 
-  removeTeamMember: (memberId: string) => void;
+  removeTeamMember: (memberId: string) => Promise<void>;
 
-  updateTeamPlace: (teamId: string, place: number) => void;
+  updateTeamPlace: (teamId: string, place: number) => Promise<void>;
 
-  getTeamMember: (memberId: string) => TeamMember | undefined;
+  getTeamMember: (memberId: string) => Promise<TeamMember | undefined>;
 
-  getTeamMemberByEmail: (email: string) => TeamMember[];
+  getTeamMemberByEmail: (email: string) => Promise<TeamMember[]>;
 };
+
+const teamRef = refUtil(TEAM_COLLECTION);
+
+const teamMemberRef = refUtil(TEAM_MEMBER_COLLECTION);
 
 const DefaultTeamService = {
   setTeamSuccess: (teamId: string) => {
-    teams = teams.map((team: Team) => {
-      if (team.id === teamId) {
-        return {
-          ...team,
-          done: true,
-        };
-      }
-      return team;
-    })
+    return teamRef(teamId).update({ done: true });
   },
 
   createTeam: (name: string, huntId: string) => {
+    const id = uuid();
     const newTeam = {
       name,
       huntId,
-      id: `${Math.random()}`,
+      id,
       place: 0,
       done: false,
     };
-    teams.push(newTeam);
-    return newTeam;
+
+    return teamRef(id).set(newTeam).then(() => newTeam);
   },
 
   getTeams: (huntId: string) => {
-    return teams.filter((team: Team) => team.huntId === huntId);
+    return teamRef().orderByChild('huntId').equalTo(huntId).once('value')
+      .then((dataSnapshot: firebase.database.DataSnapshot) => Object.values(dataSnapshot.val()));
   },
 
   getTeam: (name: string, huntId: string) => {
-    return teams.find((team: Team) => team.name === name && team.huntId === huntId);
+    return teamRef().orderByChild('huntId').equalTo(huntId).orderByChild('name').equalTo(name).once('value')
+    .then((dataSnapshot: firebase.database.DataSnapshot) => Object.values(dataSnapshot.val())[0]);
   },
 
   updateTeam: (update: TeamUpdate) => {
-    teams = teams.map((team: Team) => {
-      if (team.id === update.teamId) {
-        return {
-          ...team,
-          name: update.name || team.name,
-        };
-      }
-      return team;
-    });
+    if (update.name) {
+      return teamRef(update.teamId).update({ name: update.name });
+    }
   },
 
   setTeamMembers: (teamId: string, newTeamMembers: NewTeamMember[]) => {
-    teamMembers = teamMembers.filter((member: TeamMember) => member.teamId !== teamId);
-    teamMembers = [...teamMembers, ...newTeamMembers.map((newMember: NewTeamMember) => ({
-      ...newMember,
+    const augmentedNewTeamMembers = newTeamMembers.map((tm: NewTeamMember) => ({
+      ...tm,
+      id: uuid(),
       teamId,
-      id: `${Math.random()}`,
-    }))];
-  },
-
-  getTeamMembers: (teamId: string) => {
-    return teamMembers.filter((member: TeamMember) => member.teamId === teamId);
-  },
-
-  removeTeam: (teamId: string) => {
-    teams = teams.filter((team: Team) => team.id !== teamId);
-    teamMembers = teamMembers.filter((tm: TeamMember) => tm.teamId !== teamId);
-  },
-
-  removeTeamMember: (memberId: string) => {
-    teamMembers = teamMembers.filter((member: TeamMember) => member.id !== memberId);
-  },
-
-  updateTeamPlace: (teamId: string, place: number) => {
-    teams = teams.map((team: Team) => {
-      if (teamId === team.id) {
-        return { ...team, place };
-      }
-      return team;
+    }));
+    return augmentedNewTeamMembers.map((tm: TeamMember) => {
+      return teamMemberRef(tm.id).set(tm);
     });
   },
 
+  getTeamMembers: (teamId: string) => {
+    return teamMemberRef().orderByChild('teamId').equalTo(teamId).once('value')
+    .then(
+      (dataSnapshot: firebase.database.DataSnapshot) => Object.values(dataSnapshot.val())
+    );
+  },
+
+  removeTeam: (teamId: string) => {
+    return teamRef(teamId).remove()
+    .then(() => {
+      return teamMemberRef().orderByChild('teamId').equalTo(teamId).once('value')
+      .then((dataSnapshot: firebase.database.DataSnapshot) => dataSnapshot.ref.remove());
+    });
+  },
+
+  removeTeamMember: (memberId: string) => {
+    return teamMemberRef(memberId).remove();
+  },
+
+  updateTeamPlace: (teamId: string, place: number) => {
+    return teamRef(teamId).update({ place });
+  },
+
   getTeamMember: (memberId: string) => {
-    return teamMembers.find(({ id }: TeamMember) => id === memberId);
+    return teamMemberRef(memberId).once('value')
+    .then((dataSnapshot: firebase.database.DataSnapshot) =>dataSnapshot.val());
   },
 
   getTeamById: (teamId: string) => {
-    return teams.find(({ id }: Team) => id === teamId);
+    return teamRef(teamId).once('value')
+    .then((dataSnapshot: firebase.database.DataSnapshot) =>dataSnapshot.val());
   },
 
   getTeamMemberByEmail: (email: string) => {
-    return teamMembers.filter((member: TeamMember) => member.email === email);
+    return teamMemberRef().orderByChild('email').equalTo(email).once('value')
+    .then((dataSnapshot: firebase.database.DataSnapshot) => Object.values(dataSnapshot.val())[0]);
   },
 
 };

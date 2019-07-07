@@ -1,5 +1,13 @@
 import * as firebase from 'firebase';
 
+export const refUtil = (collectionName: string) => (id?: string): firebase.database.Reference => {
+  const db = firebase.database();
+  if (id) {
+    return db.ref(`${collectionName}/${id}`);
+  }
+  return db.ref(collectionName);
+};
+
 const firebaseConfig = {
   apiKey: process.env["FIRE_BASE_API_KEY"],
   authDomain: process.env["FIRE_BASE_AUTH_DOMAIN"],

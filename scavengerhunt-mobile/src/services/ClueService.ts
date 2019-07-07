@@ -1,39 +1,13 @@
+import * as firebase from 'firebase';
+import uuid from 'uuid/v1';
 import { LatLng } from '../domain/LatLng';
 import { ClueUpdate, Clue } from '../domain/Clue';
 import { InProgressClue } from '../domain/InProgressClue';
+import { refUtil } from './DatabaseService';
 
-// TODO delete
-let clues: Clue[] = [
-  {
-    text: 'This is a clue.',
-    id: 'cluid',
-    creatorId: 'x',
-    huntId: 'huntidy',
-    assetUri: undefined,
-    location: [0, 0],
-    number: 0,
-  },
-  {
-    text: 'This is another  clue.',
-    id: 'cluid2',
-    creatorId: 'x',
-    huntId: 'huntidy',
-    assetUri: undefined,
-    location: [0, 0],
-    number: 1,
-  },
-  {
-    text: 'This is another  clue.',
-    id: 'cluid29',
-    creatorId: 'x',
-    huntId: 'huntidy',
-    assetUri: undefined,
-    location: [0, 0],
-    number: 13,
-  },
-];
-// TODO delete
-let inProgressClues: InProgressClue[] = [];
+const clueRef = refUtil('clues');
+
+const inProgressClueRef = refUtil('inprogressclues');
 
 type ClueService = {
   createClue: (
@@ -43,28 +17,29 @@ type ClueService = {
     creatorId: string,
     clueNumber: number,
     assetUri?: string,
-  ) => Clue;
+  ) => Promise<Clue>;
 
-  deleteClue: (clueId: string) => void;
+  deleteClue: (clueId: string) => Promise<void>;
 
-  solveClue: (clueId: string) => void;
+  solveClue: (clueId: string) => Promise<void>;
 
-  startClue: (clueId: string, teamId: string) => void;
+  startClue: (clueId: string, teamId: string) => Promise<void>;
 
-  isClueInProgress: (clueId: string, teamId: string) => boolean;
+  getInProgressClue: (teamId: string) => Promise<undefined | InProgressClue>;
 
-  getInProgressClue: (teamId: string) => undefined | InProgressClue;
+  updateClue: (update: ClueUpdate) => Promise<undefined | Clue>;
 
-  updateClue: (update: ClueUpdate) => undefined | Clue;
+  getClues: (huntId: string) => Promise<Clue[]>;
 
-  getClues: (huntId: string) => Clue[];
+  getClue: (clueId: string) => Promise<Clue | undefined>;
 
-  getClue: (clueId: string) => Clue | undefined;
+  getClueByNumber: (huntId: string, rank: number) => Promise<Clue | undefined>;
 
-  getClueByNumber: (huntId: string, rank: number) => Clue | undefined;
-
-  setInProgressClue: (clueId: string, teamId: string) => void;
+  setInProgressClue: (clueId: string, teamId: string) => Promise<void>;
 };
+
+const getInProgressClueSnapshotByClueId = (clueId: string): Promise<firebase.database.DataSnapshot> =>
+  inProgressClueRef().orderByChild('clueId').equalTo(clueId).once('value');
 
 const DefaultClueService: ClueService = {
   createClue: (
@@ -75,88 +50,82 @@ const DefaultClueService: ClueService = {
       clueNumber: number,
       assetUri?: string,
     ) => {
+    const id = uuid();
     const newClue = {
       number: clueNumber,
       text,
       huntId,
       creatorId,
       assetUri,
-      id: `${Math.random()}`,
+      id,
       location,
     };
 
-    clues.push(newClue);
-
-    return newClue;
+    return clueRef(id).set(newClue).then(x => x.val());
   },
 
   deleteClue: (clueId: string) => {
-    clues = clues.filter(({ id }: Clue) => id !== clueId);
-    inProgressClues = inProgressClues.filter((clue: InProgressClue) => clue.clueId !== clueId);
+    return clueRef(clueId).remove().then(() => {
+      return getInProgressClueSnapshotByClueId(clueId).then(x => x.ref.remove());
+    });
   },
 
   solveClue: (clueId: string) => {
-    inProgressClues = inProgressClues.map((clue: InProgressClue) => {
-      if (clue.clueId === clueId) {
-        return {...clue, solved: true };
-      }
-      return clue;
-    });
+    return getInProgressClueSnapshotByClueId(clueId).then(x => x.ref.update({ solved: true }));
   },
 
   startClue: (clueId: string, teamId: string) => {
+    const id = uuid();
     const newInProgressClue = {
-        clueId,
-        solved: false,
-        teamId,
+      id,
+      clueId,
+      solved: false,
+      teamId,
     };
 
-    inProgressClues.push(newInProgressClue);
+    return inProgressClueRef(clueId).set(newInProgressClue);
   },
 
-  isClueInProgress: (clueId: string, teamId: string) => {
-    const found = inProgressClues.find((clue: InProgressClue) => teamId === clue.teamId && clueId === clue.clueId);
-    return !!found;
+  getInProgressClue: (teamId: string) => {
+    return inProgressClueRef().orderByChild('teamId').equalTo(teamId).once('value')
+    .then(
+      (dataSnapshot: firebase.database.DataSnapshot) => dataSnapshot.val()
+    );
   },
-
-  getInProgressClue: (teamId: string) =>
-    inProgressClues.find((clue: InProgressClue) => teamId === clue.teamId),
 
   updateClue: ({ clueId, ...rest }: ClueUpdate) => {
-      const foundClue = clues.find(({ id }) => id === clueId);
-      if (foundClue) {
-        const newClue = {...foundClue, ...rest };
-        clues = clues.map((clue: Clue) => {
-          if (clue.id === clueId) {
-            return newClue;
-          }
-          return clue;
-        });
-        return newClue;
-      }
-      return;
+    return clueRef(clueId).update(rest);
   },
 
   getClues: (huntId: string) => {
-    return clues.filter((clue: Clue) => clue.huntId === huntId);
+    return clueRef().orderByChild('huntId').equalTo(huntId).once('value')
+    .then(
+      (dataSnapshot: firebase.database.DataSnapshot) => dataSnapshot.val()
+    );
   },
 
-  getClue: (clueId: string) => clues.find(({ id }: Clue) => id === clueId),
+  getClue: (clueId: string) => {
+    return clueRef(clueId).once('value')
+    .then(
+      (dataSnapshot: firebase.database.DataSnapshot) => dataSnapshot.val()
+    );
+  },
 
   getClueByNumber: (huntId: string, rank: number) => {
-    return clues.find((clue: Clue) => clue.huntId === huntId && rank === clue.number);
+    return clueRef()
+    .orderByChild('huntId').equalTo(huntId)
+    .orderByChild('number').equalTo(rank)
+    .once('value')
+    .then(
+      (dataSnapshot: firebase.database.DataSnapshot) => dataSnapshot.val()
+    );
   },
 
   setInProgressClue: (clueId: string, teamId: string) => {
-    inProgressClues = inProgressClues.map((clue: InProgressClue) => {
-       if (clue.teamId === teamId) {
-         return {
-           ...clue,
-           clueId,
-         };
-       }
-       return clue;
-    });
+    return inProgressClueRef().orderByChild('teamId').equalTo(teamId).once('value')
+    .then(
+      (dataSnapshot: firebase.database.DataSnapshot) => dataSnapshot.ref.update({ clueId })
+    );
   },
 };
 

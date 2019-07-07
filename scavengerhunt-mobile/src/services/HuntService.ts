@@ -1,104 +1,70 @@
+import * as firebase from 'firebase';
+import uuid from 'uuid/v1';
 import { LatLng } from '../domain/LatLng';
 import { Hunt } from '../domain/Hunt';
 
 type HuntService = {
-  getAllHunts: (creatorId: string) => Hunt[];
+  getAllHunts: (creatorId: string) => Promise<Hunt[]>;
 
-  getHunt: (huntId: string) => Hunt | undefined;
+  getHunt: (huntId: string) => Promise<Hunt | undefined>;
 
-  createHunt: (name: string, creatorId: string, startLocation: LatLng) => Hunt;
+  createHunt: (name: string, creatorId: string, startLocation: LatLng) => Promise<Hunt>;
 
-  deleteHunt: (huntId: string) => void;
+  deleteHunt: (huntId: string) => Promise<void>;
 
-  startHunt: (huntId: string) => void;
+  startHunt: (huntId: string) => Promise<void>;
 
-  stopHunt: (huntId: string) => void;
+  stopHunt: (huntId: string) => Promise<void>;
 
-  endHunt: (huntId: string) => void;
+  endHunt: (huntId: string) => Promise<void>;
 };
-
-// TODO replace with mongo
-let hunts: Hunt[] = [{
-    startLocation: [0, 0],
-    name: 'another hunt',
-    creatorId: 'x',
-    id: 'huntidy',
-    inProgress: true,
-    ended: false,
-    createdAt: new Date(),
-  },
-  {
-      startLocation: [0, 0],
-      name: 'MORE',
-      creatorId: 'x',
-      id: 'huntiidy',
-      inProgress: true,
-      ended: false,
-      createdAt: new Date(),
-  },
-  {
-      startLocation: [0, 0],
-      name: 'MORE HUNT NAMES',
-      creatorId: 'x',
-      id: 'tiidy',
-      inProgress: true,
-      ended: false,
-      createdAt: new Date(),
-  },
-];
 
 const DefaultHuntService: HuntService = {
   getAllHunts: (creatorId: string) => {
-    return hunts.filter((hunt: Hunt) => hunt.creatorId === creatorId);
+    return firebase.database()
+    .ref('hunts')
+    .orderByChild('creatorId')
+    .equalTo(creatorId)
+    .once('value')
+    .then((dataSnapshot: firebase.database.DataSnapshot) => {
+      console.log(dataSnapshot)
+      return Object.values(dataSnapshot.val());
+    });
   },
 
-  getHunt: (huntId: string) => hunts.find((hunt: Hunt) => hunt.id === huntId),
+  getHunt: (huntId: string) => {
+    return firebase.database().ref(`hunts/${huntId}`).once('value').then(x => x.val());
+  },
 
-  createHunt: (name: string, creatorId: string, startLocation: LatLng) => {
+  createHunt: async (name: string, creatorId: string, startLocation: LatLng) => {
+    const id = uuid();
     const newHunt = {
       startLocation,
       name,
       creatorId,
-      id: `${Math.random()}`,
+      id,
       inProgress: false,
       ended: false,
       createdAt: new Date(),
     };
 
-    hunts.push(newHunt);
-
-    return newHunt;
+    return firebase.database().ref(`hunt/${id}`).set(newHunt).then(() => newHunt);
   },
 
   deleteHunt: (huntId: string) => {
-    hunts = hunts.filter((hunt: Hunt) => hunt.id !== huntId);
+    return firebase.database().ref(`hunts/${huntId}`).remove();
   },
 
   startHunt: (huntId: string) => {
-    hunts = hunts.map((hunt: Hunt) => {
-      if (hunt.id === huntId) {
-        return { ...hunt, inProgress: true };
-      }
-      return hunt;
-    });
+    return firebase.database().ref(`hunts/${huntId}`).update({ inProgress: true });
   },
 
   stopHunt: (huntId: string) => {
-    hunts = hunts.map((hunt: Hunt) => {
-      if (hunt.id === huntId) {
-        return { ...hunt, inProgress: false };
-      }
-      return hunt;
-    });
+    return firebase.database().ref(`hunts/${huntId}`).update({ inProgress: false });
   },
 
   endHunt: (huntId: string) => {
-    hunts = hunts.map((hunt: Hunt) => {
-      if (hunt.id === huntId) {
-        return { ...hunt, inProgress: false, ended: true };
-      }
-      return hunt;
-    });
+    return firebase.database().ref(`hunts/${huntId}`).update({ inProgress: false, ended: true  });
   },
 
 };
