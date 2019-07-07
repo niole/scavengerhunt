@@ -21,7 +21,7 @@ const emailTeams = (huntId: string) => () => {
         console.log('emailed teams for hunt ', huntId);
     })
     .catch((error: any) => {
-        console.error('oh no ', error);
+        console.log('ERROR', error);
     });
 };
 

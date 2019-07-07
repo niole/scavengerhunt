@@ -5,7 +5,7 @@ import TextField from './TextField';
 import { LatLng } from '../domain/LatLng';
 import MapView, { Marker } from 'react-native-maps';
 
-const styles = StyleSheet.create({
+const defaultStyles = StyleSheet.create({
     map: { margin: 5, height: 400 },
 });
 
@@ -51,16 +51,22 @@ const LocationSelector = ({
         onLocationSelect,
         error,
     }: Props) => {
+        const [styles, setStyles] = React.useState();
         const [location, setLocation] = React.useState(defaultLocation);
         const [defaultState, setDefaultState] = React.useState([0, 0] as LatLng);
         React.useEffect(() => {
             if (!defaultLocation) {
+                setTimeout(() => {
+                    setStyles(defaultStyles.map); // this is a workaround for the user locator button
+                    // not rendering on first render in android
+                }, 250);
+
                 navigator.geolocation.getCurrentPosition(
                     ({ coords }) => {
                         setDefaultState([coords.latitude, coords.longitude])
                     },
                     (error: any) => {
-                        console.error(error);
+                        console.log('ERROR', error);
                     },
                     {
                         enableHighAccuracy: true,
@@ -80,7 +86,7 @@ const LocationSelector = ({
                     latitudeDelta: 0.0922,
                     longitudeDelta: 0.0421,
                 }}
-                style={styles.map}
+                style={styles}
                 showsMyLocationButton={true}
                 onPress={handlePress(onLocationSelect, setLocation)}
                 showsUserLocation={true}

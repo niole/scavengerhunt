@@ -8,6 +8,22 @@ export const refUtil = (collectionName: string) => (id?: string): firebase.datab
   return db.ref(collectionName);
 };
 
+export function getOne<D>(query: firebase.database.Query): Promise<D | undefined> {
+  return query.once('value').then(
+    (dataSnapshot: firebase.database.DataSnapshot) => dataSnapshot.val() as D
+  );
+}
+
+export function getMany<D>(query: firebase.database.Query): Promise<D[]> {
+  return query.once('value').then((dataSnapshot: firebase.database.DataSnapshot) => {
+    const data = dataSnapshot.val();
+    if (data) {
+      return Object.values(data) as D[];
+    }
+    return [] as D[];
+  });
+}
+
 const firebaseConfig = {
   apiKey: process.env["FIRE_BASE_API_KEY"],
   authDomain: process.env["FIRE_BASE_AUTH_DOMAIN"],

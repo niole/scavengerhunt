@@ -19,7 +19,7 @@ import ValidatedForm, { PluggableProps } from '../../components/ValidatedForm';
 import LocationSelector from '../../components/LocationSelector';
 import withToggle from '../../containers/withToggle';
 
-const Modal = withToggle<{ buttonProps?: any; onConfirm: (name: string, location: LatLng) => void}>(props => (
+const CreateHuntModal = withToggle<{ buttonProps?: any; onConfirm: (name: string, location: LatLng) => void}>(props => (
     <Dialog open={props.visible} onClose={props.onClose} title="Create A Hunt">
         <View paddingT-24>
             <ValidatedForm
@@ -84,29 +84,39 @@ type OuterProps = {
 } & NavigationProps;
 
 const dataFetcher = withDataGetter<OuterProps, { hunts: Hunt[]; creatorId: string; creatorName: string }>(
-    async ({ creatorId, ...rest }) => ({ hunts: HuntService.getAllHunts(creatorId), creatorId, ...rest }),
+    ({ creatorId, ...rest }) => {
+        return HuntService.getAllHunts(creatorId).then((hunts: Hunt[]) => ({ hunts, creatorId, ...rest }));
+    },
     undefined,
     (props: OuterProps) => props.creatorId,
 );
 
-const handleHuntCreate = (creatorId: string, setHunts: () => void) => (name: string, location: LatLng) => {
-    HuntService.createHunt(name, creatorId, location);
-    setHunts();
+const handleHuntCreate = (creatorId: string, setHunts: () => void) => async (name: string, location: LatLng) => {
+    try {
+        await HuntService.createHunt(name, creatorId, location);
+        setHunts();
+    } catch (error) {
+        console.log('ERROR', error);
+    }
 };
 
 const handleNavigate = (navigation: NavigationProps['navigation']) => (huntId: string, creatorId: string) => {
     navigation.navigate('hunt', { huntId, creatorId });
 };
 
-const removeHunt = (huntId: string, getData: () => void) => () => {
-    HuntService.deleteHunt(huntId);
-    getData();
+const removeHunt = (huntId: string, getData: () => void) => async () => {
+    try {
+        await HuntService.deleteHunt(huntId);
+        getData();
+    } catch (error) {
+        console.log('ERROR', error);
+    }
 };
 
 const Home = ({ navigation, creatorName, hunts, creatorId, getData }: Props) => (
     <MainView title={`Welcome ${creatorName}`}>
         <ActionBar>
-            {props => <Modal onConfirm={handleHuntCreate(creatorId, getData)} buttonProps={props}/>}
+            {props => <CreateHuntModal onConfirm={handleHuntCreate(creatorId, getData)} buttonProps={props}/>}
             {props => <Button {...props} onClick={() => navigation.navigate('invitations', { creatorId })}>
                 View Invitations
             </Button>}

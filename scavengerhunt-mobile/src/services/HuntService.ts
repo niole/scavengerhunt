@@ -2,6 +2,9 @@ import * as firebase from 'firebase';
 import uuid from 'uuid/v1';
 import { LatLng } from '../domain/LatLng';
 import { Hunt } from '../domain/Hunt';
+import { refUtil, getMany, getOne } from './DatabaseService';
+
+const huntsRef = refUtil('hunts');
 
 type HuntService = {
   getAllHunts: (creatorId: string) => Promise<Hunt[]>;
@@ -21,19 +24,13 @@ type HuntService = {
 
 const DefaultHuntService: HuntService = {
   getAllHunts: (creatorId: string) => {
-    return firebase.database()
-    .ref('hunts')
+    return getMany<Hunt>(huntsRef()
     .orderByChild('creatorId')
-    .equalTo(creatorId)
-    .once('value')
-    .then((dataSnapshot: firebase.database.DataSnapshot) => {
-      console.log(dataSnapshot)
-      return Object.values(dataSnapshot.val());
-    });
+    .equalTo(creatorId));
   },
 
   getHunt: (huntId: string) => {
-    return firebase.database().ref(`hunts/${huntId}`).once('value').then(x => x.val());
+    return getOne<Hunt>(huntsRef(huntId));
   },
 
   createHunt: async (name: string, creatorId: string, startLocation: LatLng) => {
@@ -48,23 +45,23 @@ const DefaultHuntService: HuntService = {
       createdAt: new Date(),
     };
 
-    return firebase.database().ref(`hunt/${id}`).set(newHunt).then(() => newHunt);
+    return huntsRef(id).set(newHunt).then(() => newHunt);
   },
 
   deleteHunt: (huntId: string) => {
-    return firebase.database().ref(`hunts/${huntId}`).remove();
+    return huntsRef(huntId).remove();
   },
 
   startHunt: (huntId: string) => {
-    return firebase.database().ref(`hunts/${huntId}`).update({ inProgress: true });
+    return huntsRef(huntId).update({ inProgress: true });
   },
 
   stopHunt: (huntId: string) => {
-    return firebase.database().ref(`hunts/${huntId}`).update({ inProgress: false });
+    return huntsRef(huntId).update({ inProgress: false });
   },
 
   endHunt: (huntId: string) => {
-    return firebase.database().ref(`hunts/${huntId}`).update({ inProgress: false, ended: true  });
+    return huntsRef(huntId).update({ inProgress: false, ended: true  });
   },
 
 };

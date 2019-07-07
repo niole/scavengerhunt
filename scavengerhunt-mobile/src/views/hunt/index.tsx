@@ -41,12 +41,15 @@ type FetchResult = {
 };
 
 const dataFetcher = withDataGetter<OuterProps, FetchResult>(
-    async (props: OuterProps) => ({
-        hunt: HuntService.getHunt(props.navigation.getParam('huntId')),
-        clues: ClueService.getClues(props.navigation.getParam('huntId')),
+    (props: OuterProps) => Promise.all([
+        HuntService.getHunt(props.navigation.getParam('huntId')),
+        ClueService.getClues(props.navigation.getParam('huntId')),
+    ]).then(([hunt, clues]) => ({
+        hunt,
+        clues,
         creatorId: props.navigation.getParam('creatorId'),
         ...props
-    }),
+    })),
     (props: OuterProps) => ({ clues: [], ...props }),
     (props: OuterProps) => `${props.navigation.getParam('huntId')}${props.navigation.getParam('creatorId')}`
 );
