@@ -12,44 +12,50 @@ const solveCurrentClue = (
         inProgressClue: Clue,
         teamId: string,
         huntId: string,
-    ) => () => {
-        const { location } = inProgressClue;
-        HuntLocationService.canSolveClue(location)
-        .then((solved: boolean) => {
-            if (solved) {
-                const shouldContinue = window.confirm('Congratulations! Continue to the next clue.');
-                if (shouldContinue) {
-                    const clue = ClueService.getClueByNumber(huntId, inProgressClue.number + 1);
-                    if (!!clue) {
-                        ClueService.setInProgressClue(clue.id, teamId);
-                        setInProgressClue(clue);
+    ) => async () => {
+    const { location } = inProgressClue;
+    try {
+        const solved = await HuntLocationService.canSolveClue(location)
+        if (solved) {
+            const shouldContinue = window.confirm('Congratulations! Continue to the next clue.');
+            if (shouldContinue) {
+                const clue = await ClueService.getClueByNumber(huntId, inProgressClue.number + 1);
+                if (!!clue) {
+                    await ClueService.setInProgressClue(clue.id, teamId);
+                    setInProgressClue(clue);
+                } else {
+                    // possibly over
+                    const allClues = await ClueService.getClues(huntId);
+                    const sortedClues = allClues.sort((a: Clue, b: Clue) => a.number - b.number);
+                    if (sortedClues[sortedClues.length - 1].number === inProgressClue.number) {
+                        // it's over
+                        alert('Congratulations! You finished the hunt.');
+                        handleHuntSuccess();
                     } else {
-                        // possibly over
-                        const allClues = ClueService.getClues(huntId);
-                        const sortedClues = allClues.sort((a: Clue, b: Clue) => a.number - b.number);
-                        if (sortedClues[sortedClues.length - 1].number === inProgressClue.number) {
-                            // it's over
-                            alert('Congratulations! You finished the hunt.');
-                            handleHuntSuccess();
-                        } else {
-                            // there's a bug
-                            throw new Error(`Clue number: ${inProgressClue.number + 1} is missing.`);
-                        }
+                        // there's a bug
+                        throw new Error(`Clue number: ${inProgressClue.number + 1} is missing.`);
                     }
                 }
-            } else {
-                alert('Try again.');
             }
-        });
+        } else {
+            alert('Try again.');
+        }
+    } catch (error) {
+        console.log('ERROR', error);
+    }
 };
 
-const startHunting = (setInProgressClue: (clue: Clue) => void, teamId: string, huntId: string) => () => {
-    const clue = ClueService.getClueByNumber(huntId, 0);
-    if (!!clue) {
-        ClueService.setInProgressClue(clue.id, teamId);
-        setInProgressClue(clue);
-    } else {
-        throw new Error(`There is no starting clue for hunt with id: ${huntId}`);
+const startHunting = (setInProgressClue: (clue: Clue) => void, teamId: string, huntId: string) => async () => {
+    try {
+        const clue = await ClueService.getClueByNumber(huntId, 0);
+        if (!!clue) {
+            await ClueService.setInProgressClue(clue.id, teamId);
+            setInProgressClue(clue);
+        } else {
+            throw new Error(`There is no starting clue for hunt with id: ${huntId}`);
+        }
+    } catch (error) {
+        console.log('ERROR', error);
     }
 };
 
@@ -74,13 +80,20 @@ const ClueSolver = ({
     }: Props) => {
     const [inProgressClue, setInProgressClue] = React.useState();
     React.useEffect(() => {
-        const inProgress = ClueService.getInProgressClue(teamId)
-        if (!!inProgress) {
-            const clue = ClueService.getClue(inProgress.clueId);
-            if (!!clue) {
-                setInProgressClue(clue);
+        ClueService.getInProgressClue(teamId)
+        .then(inProgress => {
+            if (!!inProgress) {
+                return ClueService.getClue(inProgress.clueId)
+                .then(clue => {
+                    if (!!clue) {
+                        setInProgressClue(clue);
+                    }
+                });
             }
-        }
+        })
+        .catch((error: any) => {
+            console.log('ERROR', error);
+        });
     }, [teamId]);
     if (!!inProgressClue) {
         return (
