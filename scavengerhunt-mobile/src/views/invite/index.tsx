@@ -49,30 +49,44 @@ type InnerProps = {
 };
 
 const handleUpdateTeamName = (teamId: string, dataGetter: () => void) =>
-    (newName: string, teamMembers: NewTeamMember[]) => {
-    TeamService.updateTeam({
-        teamId,
-        name: newName,
-    });
-    TeamService.setTeamMembers(
-        teamId,
-        teamMembers,
-    );
-    dataGetter();
+    async (newName: string, teamMembers: NewTeamMember[]) => {
+    try {
+        await TeamService.updateTeam({
+            teamId,
+            name: newName,
+        });
+        await TeamService.setTeamMembers(
+            teamId,
+            teamMembers,
+        );
+        dataGetter();
+    } catch (error) {
+        console.log('ERROR', error);
+    }
+
 };
 
-const handleCreateTeam = (huntId: string, dataGetter: () => void) => (name: string, teamMembers: NewTeamMember[]) => {
-    const team = TeamService.createTeam(name, huntId);
-    TeamService.setTeamMembers(
-        team.id,
-        teamMembers,
-    );
-    dataGetter();
+const handleCreateTeam = (huntId: string, dataGetter: () => void) =>
+    async (name: string, teamMembers: NewTeamMember[]) => {
+    try {
+        const team = await TeamService.createTeam(name, huntId);
+        await TeamService.setTeamMembers(
+            team.id,
+            teamMembers,
+        );
+        dataGetter();
+    } catch (error) {
+        console.log('ERROR', error);
+    }
 };
 
-const handleDeleteTeam = (teamId: string, getData: () => void) => () => {
-    TeamService.removeTeam(teamId);
-    getData();
+const handleDeleteTeam = (teamId: string, getData: () => void) => async () => {
+    try {
+        await TeamService.removeTeam(teamId);
+        getData();
+    } catch (error) {
+        console.log('ERROR', error);
+    }
 };
 
 const InviteView = ({ hunt = {} as Hunt, teams, getData }: Props) => (
@@ -113,10 +127,13 @@ const InviteView = ({ hunt = {} as Hunt, teams, getData }: Props) => (
 );
 
 export default withDataGetter<OuterProps, InnerProps>(
-    async props => ({
-        hunt: HuntService.getHunt(props.navigation.getParam('huntId')),
-        teams: TeamService.getTeams(props.navigation.getParam('huntId')),
-    }),
+    async props => Promise.all([
+        HuntService.getHunt(props.navigation.getParam('huntId')),
+        TeamService.getTeams(props.navigation.getParam('huntId')),
+    ]).then(([hunt, teams]) => ({
+        hunt,
+        teams,
+    })),
     () => ({ teams: [] }),
     (props: OuterProps) => props.navigation.getParam('huntId'),
 )(InviteView);

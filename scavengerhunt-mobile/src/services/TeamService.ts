@@ -82,13 +82,17 @@ const DefaultTeamService = {
   },
 
   setTeamMembers: (teamId: string, newTeamMembers: NewTeamMember[]) => {
-    const augmentedNewTeamMembers = newTeamMembers.map((tm: NewTeamMember) => ({
-      ...tm,
-      id: uuid(),
-      teamId,
-    }));
-    return augmentedNewTeamMembers.map((tm: TeamMember) => {
-      return teamMemberRef(tm.id).set(tm);
+    return teamMemberRef().orderByChild('teamId').equalTo(teamId).once('value').then(
+      tms => tms.ref.remove()
+    ).then(() => {
+      const augmentedNewTeamMembers = newTeamMembers.map((tm: NewTeamMember) => ({
+        ...tm,
+        id: uuid(),
+        teamId,
+      }));
+      return augmentedNewTeamMembers.map((tm: TeamMember) => {
+        return teamMemberRef(tm.id).update(tm);
+      });
     });
   },
 
