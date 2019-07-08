@@ -12,12 +12,12 @@ type EmailTeamsService = {
 
 const DefaultEmailTeamsService: EmailTeamsService = {
   emailTeams: async (huntId: string) => {
-    const hunt = HuntService.getHunt(huntId);
+    const hunt = await HuntService.getHunt(huntId);
     const creator = await CreatorService.getCreatorById(hunt.creatorId);
-    const teams = TeamService.getTeams(huntId);
+    const teams = await TeamService.getTeams(huntId);
 
-    return Promise.all(teams.map((team: Team) => {
-      const teamMembers = TeamService.getTeamMembers(team.id);
+    return Promise.all(teams.map(async (team: Team) => {
+      const teamMembers = await TeamService.getTeamMembers(team.id);
       const toAddresses = teamMembers.map((member: TeamMember) => member.email);
       return email(toAddresses, {
           subject: `${creator.name} is inviting you to a Scavenger Hunt!`,

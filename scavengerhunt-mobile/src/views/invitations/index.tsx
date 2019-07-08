@@ -12,6 +12,10 @@ import HuntService from '../../services/HuntService';
 import CreatorService from '../../services/CreatorService';
 import HuntPlayCard from './HuntPlayCard';
 
+const handleGoBackToHome = (navigation: NavigationProps['navigation']) => () => {
+    navigation.navigate('home');
+};
+
 type NavigationProps = {
     navigation: NavigationScreenProp<{}, { creatorId: string }>;
 };
@@ -24,12 +28,13 @@ type OuterProps = {} & NavigationProps;
 
 const InvitationsView = (props: Props) => (
     <MainView title="Your invitations">
-        <Button fullWidth={true}>
+        <Button fullWidth={true} onClick={handleGoBackToHome(props.navigation)}>
             View Your Hunts
         </Button>
         <View>
             {props.pairedHunts.map(({ hunt, member }) => (
                 <HuntPlayCard
+                    key={member.id}
                     onPlay={() => props.navigation.navigate('play', { huntId: hunt.id, memberId: member.id })}
                     huntName={hunt.name}
                 />
@@ -40,9 +45,9 @@ const InvitationsView = (props: Props) => (
 
 const getInitialData = async (creatorId: string) => {
     const creator = await CreatorService.getCreatorById(creatorId);
-    const teamMembers = TeamService.getTeamMemberByEmail(creator.email);
-    const teams = teamMembers.map((member: TeamMember) => TeamService.getTeamById(member.teamId));
-    const hunts = teams.map((team: Team) => HuntService.getHunt(team.huntId));
+    const teamMembers = await TeamService.getTeamMembersByEmail(creator.email);
+    const teams = Promise.all(teamMembers.map((member: TeamMember) => TeamService.getTeamById(member.teamId)));
+    const hunts = await teams.then(ts => Promise.all(ts.map((team: Team) => HuntService.getHunt(team.huntId))));
     return {
         pairedHunts: teamMembers
             .map((teamMember: TeamMember, index: number) => ({ hunt: hunts[index], member: teamMember })),

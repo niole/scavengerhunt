@@ -35,7 +35,7 @@ type TeamService = {
 
   getTeamMember: (memberId: string) => Promise<TeamMember | undefined>;
 
-  getTeamMemberByEmail: (email: string) => Promise<TeamMember[]>;
+  getTeamMembersByEmail: (email: string) => Promise<TeamMember[]>;
 };
 
 const teamRef = refUtil(TEAM_COLLECTION);
@@ -124,10 +124,8 @@ const DefaultTeamService = {
     return getOne<Team>(teamRef(teamId));
   },
 
-  getTeamMemberByEmail: (email: string) => {
-    return getMany<TeamMember>(teamMemberRef().orderByChild('email').equalTo(email)).then(
-      members => members[0]
-    );
+  getTeamMembersByEmail: (email: string) => {
+    return getMany<TeamMember>(teamMemberRef().orderByChild('email').equalTo(email));
   },
 
 };

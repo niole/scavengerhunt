@@ -11,7 +11,6 @@ function getData<FetchArguments, Result>(
         props: FetchArguments,
         setResult: (result: any) => any
     ): () => void {
-    console.log('EXECUTE GET DATA');
     return () => fetcher(props).then(setResult).catch((error: any) => {
         console.log(`fetch failed: ${error}`); // console.error seems to break expo
     });
