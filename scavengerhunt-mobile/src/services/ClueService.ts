@@ -107,9 +107,14 @@ const DefaultClueService: ClueService = {
   },
 
   getClueByNumber: (huntId: string, rank: number) => {
-    return getOne<Clue>(clueRef()
-    .orderByChild('huntId').equalTo(huntId)
-    .orderByChild('number').equalTo(rank));
+    return clueRef()
+    .orderByChild('huntId')
+    .equalTo(huntId)
+    .once('value')
+    .then(clues => {
+      return getMany<Clue>(clues.ref.orderByChild('number').equalTo(rank));
+    })
+    .then(clues => clues[0]);
   },
 
   setInProgressClue: (clueId: string, teamId: string) => {

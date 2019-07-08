@@ -15,8 +15,6 @@ type TeamService = {
 
   getTeams: (huntId: string) => Promise<Team[]>;
 
-  getTeam: (name: string, huntId: string) => Promise<Team | undefined>;
-
   removeTeamMembers: (teamId: string) => Promise<void>;
 
   getTeamById: (teamId: string) => Promise<Team | undefined>;
@@ -62,11 +60,6 @@ const DefaultTeamService = {
 
   getTeams: (huntId: string) => {
     return getMany<Team>(teamRef().orderByChild('huntId').equalTo(huntId));
-  },
-
-  getTeam: (name: string, huntId: string) => {
-    return getMany<Team>(teamRef().orderByChild('huntId').equalTo(huntId).orderByChild('name').equalTo(name))
-    .then(teams => teams[0]);
   },
 
   removeTeamMembers: (teamId: string) => {

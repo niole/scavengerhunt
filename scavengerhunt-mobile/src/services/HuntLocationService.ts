@@ -11,7 +11,6 @@ const DefaultHuntLocationService: HuntLocationService = {
   canSolveClue: (clueLocation: LatLng) => {
     return new Promise((resolve, reject) => {
       navigator.geolocation.getCurrentPosition(({ coords }: any) => {
-        console.log(coords);
         const distance = getDistance(coords, { latitude: clueLocation[0], longitude: clueLocation[1] });
         if (distance <= MAX_DISTANCE) {
           resolve(true);

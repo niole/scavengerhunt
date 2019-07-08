@@ -8,8 +8,8 @@ import TeamService from '../../services/TeamService';
 import MainView from '../../components/MainView';
 import ClueSolver from './ClueSolver';
 
-const handleHuntSuccess = (navigation: NavigationProps['navigation'], huntId: string, teamId: string) => () => {
-    TeamService.setTeamSuccess(teamId);
+const handleHuntSuccess = (navigation: NavigationProps['navigation'], huntId: string, teamId: string) => async () => {
+    await TeamService.setTeamSuccess(teamId);
     navigation.navigate('success', { huntId, teamId });
 };
 

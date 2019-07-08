@@ -1,24 +1,30 @@
 import React from 'react';
 import { View, Text } from 'react-native-ui-lib';
-import { RouteComponentProps } from 'react-router';
+import { NavigationScreenProp } from 'react-navigation';
 import HuntService from '../../services/HuntService';
 import TeamService from '../../services/TeamService';
 import withDataGetter from '../../containers/withDataGetter';
 
-const getProps = (huntId: string, teamId: string): Props => {
-    const hunt = HuntService.getHunt(huntId);
-    const team = TeamService.getTeamById(teamId);
-    if (!!hunt && !!team && team.done) {
-        return {
-            huntName: hunt.name,
-            teamName: team.name,
-        };
-    } else {
-        throw new Error(`Team or hunt data is missing or hunt is not over. hunt: ${hunt}, team: ${team}.`);
+const getProps = async (huntId: string, teamId: string): Promise<Props> => {
+    try {
+        const hunt = await HuntService.getHunt(huntId);
+        const team = await TeamService.getTeamById(teamId);
+        if (!!hunt && !!team && team.done) {
+            return {
+                huntName: hunt.name,
+                teamName: team.name,
+            };
+        } else {
+            throw new Error(`Team or hunt data is missing or hunt is not over. hunt: ${hunt}, team: ${team}.`);
+        }
+    } catch (error) {
+        console.log('ERROR', error);
     }
 };
 
-type OuterProps = RouteComponentProps<{ teamId: string; huntId: string }>;
+type OuterProps = {
+    navigation: NavigationScreenProp<{}, { teamId: string; huntId: string }>;
+};
 
 type Props = {
     huntName: string;
@@ -35,5 +41,5 @@ const SuccessView = ({ huntName, teamName }: Props) => (
 );
 
 export default withDataGetter<OuterProps, Props>(
-    async (props: OuterProps) => getProps(props.match.params.huntId, props.match.params.teamId),
+    (props: OuterProps) => getProps(props.navigation.getParam('huntId'), props.navigation.getParam('teamId')),
 )(SuccessView);
