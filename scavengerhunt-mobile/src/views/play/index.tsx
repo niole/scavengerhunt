@@ -20,21 +20,25 @@ type TeamDetails = undefined | {
     memberName: string
     place: number;
 };
-const getTeamDetails = (teamMemberId: string): TeamDetails => {
-    const teamMember = TeamService.getTeamMember(teamMemberId);
-    if (!!teamMember) {
-        const team = TeamService.getTeamById(teamMember.teamId);
-        if (!!team) {
-            return {
-                memberName: teamMember.name,
-                teamId: team.id,
-                teamName: team.name,
-                memberId: teamMemberId,
-                place: team.place,
-            };
+const getTeamDetails = async (teamMemberId: string): Promise<TeamDetails> => {
+    try {
+        const teamMember = await TeamService.getTeamMember(teamMemberId);
+        if (!!teamMember) {
+            const team = await TeamService.getTeamById(teamMember.teamId);
+            if (!!team) {
+                return {
+                    memberName: teamMember.name,
+                    teamId: team.id,
+                    teamName: team.name,
+                    memberId: teamMemberId,
+                    place: team.place,
+                };
+            }
         }
+        throw new Error('This team or team member doesn\'t exist');
+    } catch (error) {
+        console.log('ERROR', error);
     }
-    throw new Error('This team or team member doesn\'t exist');
 };
 
 type HuntDetails = undefined | {
@@ -44,18 +48,23 @@ type HuntDetails = undefined | {
     ended: boolean;
     startLocation: LatLng;
 };
-const getHuntDetails = (huntId: string): HuntDetails => {
-    const hunt = HuntService.getHunt(huntId);
-    if (!!hunt) {
-        return {
-            startLocation: hunt.startLocation,
-            inProgress: hunt.inProgress,
-            ended: hunt.ended,
-            huntId,
-            huntName: hunt.name,
-        };
-    } else {
-        throw new Error('Could not find that hunt');
+
+const getHuntDetails = async (huntId: string): Promise<HuntDetails> => {
+    try {
+        const hunt = await HuntService.getHunt(huntId);
+        if (!!hunt) {
+            return {
+                startLocation: hunt.startLocation,
+                inProgress: hunt.inProgress,
+                ended: hunt.ended,
+                huntId,
+                huntName: hunt.name,
+            };
+        } else {
+            throw new Error('Could not find that hunt');
+        }
+    } catch (error) {
+        console.log('ERROR', error);
     }
 };
 
@@ -122,12 +131,16 @@ const defaultValues = {
     ended: false,
 };
 export default withDataGetter<OuterProps, Props>(
-    async (props: OuterProps) => ({
+    async (props: OuterProps) =>
+    Promise.all([
+        getHuntDetails(props.navigation.getParam('huntId')),
+        getTeamDetails(props.navigation.getParam('memberId')),
+    ]).then(([huntDetails, teamDetails]) => ({
         ...defaultValues,
-        ...(getHuntDetails(props.navigation.getParam('huntId')) || {}),
-        ...(getTeamDetails(props.navigation.getParam('memberId')) || {}),
+        ...(huntDetails || {}),
+        ...(teamDetails || {}),
         ...props
-    }),
+    })),
     undefined,
     (props: OuterProps) => props.navigation.getParam('huntId'),
 )(PlayView);
